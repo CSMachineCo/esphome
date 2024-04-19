@@ -8,7 +8,7 @@
 #include "esphome/core/component.h"
 #include "esphome/core/hal.h"
 #include "esphome/core/log.h"
-#include "src/esphome/components/uart/uart.h"
+#include "/src/esphome/components/uart/uart.h"
 
 namespace esphome {
 namespace uart {
