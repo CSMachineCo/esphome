@@ -3,7 +3,7 @@
 #include "esphome/core/defines.h"
 #include "esphome/core/helpers.h"
 #include "esphome/core/log.h"
-#include "uart_component_esp32_arduino.h"
+#include "lora_uart_component_esp32_arduino.h"
 
 #ifdef USE_LOGGER
 #include "esphome/components/logger/logger.h"
