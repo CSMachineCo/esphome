@@ -34,24 +34,24 @@ CODEOWNERS = ["@esphome/core"]
 uart_ns = cg.esphome_ns.namespace("uart")
 UARTComponent = uart_ns.class_("UARTComponent")
 
-IDFUARTComponent = uart_ns.class_("IDFUARTComponent", UARTComponent, cg.Component)
-ESP32ArduinoUARTComponent = uart_ns.class_(
-    "ESP32ArduinoUARTComponent", UARTComponent, cg.Component
+#IDFUARTComponent = uart_ns.class_("IDFUARTComponent", UARTComponent, cg.Component)
+ESP32ArduinoLoraUARTComponent = uart_ns.class_(
+    "ESP32ArduinoLoraUARTComponent", UARTComponent, cg.Component
 )
-ESP8266UartComponent = uart_ns.class_(
-    "ESP8266UartComponent", UARTComponent, cg.Component
-)
-RP2040UartComponent = uart_ns.class_("RP2040UartComponent", UARTComponent, cg.Component)
-LibreTinyUARTComponent = uart_ns.class_(
-    "LibreTinyUARTComponent", UARTComponent, cg.Component
-)
+#ESP8266UartComponent = uart_ns.class_(
+#    "ESP8266UartComponent", UARTComponent, cg.Component
+#)
+#RP2040UartComponent = uart_ns.class_("RP2040UartComponent", UARTComponent, cg.Component)
+#LibreTinyUARTComponent = uart_ns.class_(
+#    "LibreTinyUARTComponent", UARTComponent, cg.Component
+#)
 
 NATIVE_UART_CLASSES = (
-    str(IDFUARTComponent),
-    str(ESP32ArduinoUARTComponent),
-    str(ESP8266UartComponent),
-    str(RP2040UartComponent),
-    str(LibreTinyUARTComponent),
+ #   str(IDFUARTComponent),
+    str(ESP32ArduinoLoraUARTComponent)
+ #   str(ESP8266UartComponent),
+ #   str(RP2040UartComponent),
+ #   str(LibreTinyUARTComponent),
 )
 
 UARTDevice = uart_ns.class_("UARTDevice")
@@ -95,17 +95,17 @@ def validate_invert_esp32(config):
 
 
 def _uart_declare_type(value):
-    if CORE.is_esp8266:
-        return cv.declare_id(ESP8266UartComponent)(value)
+#    if CORE.is_esp8266:
+#        return cv.declare_id(ESP8266UartComponent)(value)
     if CORE.is_esp32:
         if CORE.using_arduino:
-            return cv.declare_id(ESP32ArduinoUARTComponent)(value)
-        if CORE.using_esp_idf:
-            return cv.declare_id(IDFUARTComponent)(value)
-    if CORE.is_rp2040:
-        return cv.declare_id(RP2040UartComponent)(value)
-    if CORE.is_libretiny:
-        return cv.declare_id(LibreTinyUARTComponent)(value)
+            return cv.declare_id(ESP32ArduinoLoraUARTComponent)(value)
+#        if CORE.using_esp_idf:
+#            return cv.declare_id(IDFUARTComponent)(value)
+#    if CORE.is_rp2040:
+#        return cv.declare_id(RP2040UartComponent)(value)
+#    if CORE.is_libretiny:
+#        return cv.declare_id(LibreTinyUARTComponent)(value)
     raise NotImplementedError
 
 

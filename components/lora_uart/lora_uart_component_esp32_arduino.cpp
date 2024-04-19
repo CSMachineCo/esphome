@@ -24,7 +24,7 @@ static const uint32_t UART_NB_STOP_BIT_1 = 1 << 4;
 static const uint32_t UART_NB_STOP_BIT_2 = 3 << 4;
 static const uint32_t UART_TICK_APB_CLOCK = 1 << 27;
 
-uint32_t ESP32ArduinoUARTComponent::get_config() {
+uint32_t ESP32ArduinoLoraUARTComponent::get_config() {
   uint32_t config = 0;
 
   /*
@@ -73,7 +73,7 @@ uint32_t ESP32ArduinoUARTComponent::get_config() {
   return config;
 }
 
-void ESP32ArduinoUARTComponent::setup() {
+void ESP32ArduinoLoraUARTComponent::setup() {
   ESP_LOGCONFIG(TAG, "Setting up UART...");
   // Use Arduino HardwareSerial UARTs if all used pins match the ones
   // preconfigured by the platform. For example if RX disabled but TX pin
@@ -117,7 +117,7 @@ void ESP32ArduinoUARTComponent::setup() {
   this->load_settings(false);
 }
 
-void ESP32ArduinoUARTComponent::load_settings(bool dump_config) {
+void ESP32ArduinoLoraUARTComponent::load_settings(bool dump_config) {
   int8_t tx = this->tx_pin_ != nullptr ? this->tx_pin_->get_pin() : -1;
   int8_t rx = this->rx_pin_ != nullptr ? this->rx_pin_->get_pin() : -1;
   bool invert = false;
@@ -133,7 +133,7 @@ void ESP32ArduinoUARTComponent::load_settings(bool dump_config) {
   }
 }
 
-void ESP32ArduinoUARTComponent::dump_config() {
+void ESP32ArduinoLoraUARTComponent::dump_config() {
   ESP_LOGCONFIG(TAG, "UART Bus %d:", this->number_);
   LOG_PIN("  TX Pin: ", tx_pin_);
   LOG_PIN("  RX Pin: ", rx_pin_);
@@ -147,7 +147,7 @@ void ESP32ArduinoUARTComponent::dump_config() {
   this->check_logger_conflict();
 }
 
-void ESP32ArduinoUARTComponent::write_array(const uint8_t *data, size_t len) {
+void ESP32ArduinoLoraUARTComponent::write_array(const uint8_t *data, size_t len) {
   this->hw_serial_->write(data, len);
 #ifdef USE_UART_DEBUGGER
   for (size_t i = 0; i < len; i++) {
@@ -156,14 +156,14 @@ void ESP32ArduinoUARTComponent::write_array(const uint8_t *data, size_t len) {
 #endif
 }
 
-bool ESP32ArduinoUARTComponent::peek_byte(uint8_t *data) {
+bool ESP32ArduinoLoraUARTComponent::peek_byte(uint8_t *data) {
   if (!this->check_read_timeout_())
     return false;
   *data = this->hw_serial_->peek();
   return true;
 }
 
-bool ESP32ArduinoUARTComponent::read_array(uint8_t *data, size_t len) {
+bool ESP32ArduinoLoraUARTComponent::read_array(uint8_t *data, size_t len) {
   if (!this->check_read_timeout_(len))
     return false;
   this->hw_serial_->readBytes(data, len);
@@ -175,13 +175,13 @@ bool ESP32ArduinoUARTComponent::read_array(uint8_t *data, size_t len) {
   return true;
 }
 
-int ESP32ArduinoUARTComponent::available() { return this->hw_serial_->available(); }
-void ESP32ArduinoUARTComponent::flush() {
+int ESP32ArduinoLoraUARTComponent::available() { return this->hw_serial_->available(); }
+void ESP32ArduinoLoraUARTComponent::flush() {
   ESP_LOGVV(TAG, "    Flushing...");
   this->hw_serial_->flush();
 }
 
-void ESP32ArduinoUARTComponent::check_logger_conflict() {
+void ESP32ArduinoLoraUARTComponent::check_logger_conflict() {
 #ifdef USE_LOGGER
   if (this->hw_serial_ == nullptr || logger::global_logger->get_baud_rate() == 0) {
     return;

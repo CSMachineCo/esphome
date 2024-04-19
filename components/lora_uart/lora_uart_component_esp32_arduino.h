@@ -13,7 +13,7 @@
 namespace esphome {
 namespace uart {
 
-class ESP32ArduinoUARTComponent : public UARTComponent, public Component {
+class ESP32ArduinoLoraUARTComponent : public UARTComponent, public Component {
  public:
   void setup() override;
   void dump_config() override;
