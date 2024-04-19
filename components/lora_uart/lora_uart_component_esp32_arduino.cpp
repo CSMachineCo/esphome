@@ -24,6 +24,7 @@ static const uint32_t UART_NB_STOP_BIT_1 = 1 << 4;
 static const uint32_t UART_NB_STOP_BIT_2 = 3 << 4;
 static const uint32_t UART_TICK_APB_CLOCK = 1 << 27;
 
+//Don;t think we need this function...
 uint32_t ESP32ArduinoLoraUARTComponent::get_config() {
   uint32_t config = 0;
 
@@ -74,10 +75,27 @@ uint32_t ESP32ArduinoLoraUARTComponent::get_config() {
 }
 
 void ESP32ArduinoLoraUARTComponent::setup() {
-  ESP_LOGCONFIG(TAG, "Setting up UART...");
-  // Use Arduino HardwareSerial UARTs if all used pins match the ones
-  // preconfigured by the platform. For example if RX disabled but TX pin
-  // is 1 we still want to use Serial.
+  ESP_LOGCONFIG(TAG, "Setting up LoRa UART...");
+  // Since we're pretty much emulating an esphome uart component with an LoRa radio on SPI
+  // Turns out somebody wrote a really simple driver for that...
+  if (!radio.begin()) { //Initialize radio
+    ESP_LOGW(TAG, "Failed to Initialize LoRa Radio");}
+  
+  //TODO: Make optional config
+  //FREQUENCY - Set frequency to 915Mhz (default 915Mhz)
+  radio.configSetFrequency(915000000);  //Freq in Hz. Must comply with your local radio regulations. Probably should make this optional configuration
+
+  //TODO: Make optional config
+  //Configuration presets. Comment/uncomment to observe how long each packet takes to transmit. 
+  //radio.configSetPreset(PRESET_DEFAULT);      //Default   - Medium range, medium speed
+  //radio.configSetPreset(PRESET_FAST);       //Fast      - Faster, but less reliable at longer distances.  Use when you need fast speed and radios are closer.
+  radio.configSetPreset(PRESET_LONGRANGE);  //LongRange - Slower and more reliable.  Good for long distance or when reliability is more important than speed
+
+  //TODO: make tx rx pins configurable  
+
+
+//////////This is all old uart stuff...///////////////
+/*
   bool is_default_tx, is_default_rx;
 #ifdef CONFIG_IDF_TARGET_ESP32C3
   is_default_tx = tx_pin_ == nullptr || tx_pin_->get_pin() == 21;
@@ -113,7 +131,7 @@ void ESP32ArduinoLoraUARTComponent::setup() {
     this->number_ = next_uart_num;
     this->hw_serial_ = new HardwareSerial(next_uart_num++);  // NOLINT(cppcoreguidelines-owning-memory)
   }
-
+*/
   this->load_settings(false);
 }
 

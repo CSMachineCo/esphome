@@ -9,6 +9,7 @@
 #include "esphome/core/hal.h"
 #include "esphome/core/log.h"
 #include "uart.h"
+#include "Arduino-LoRa-Sx1262/src/LoraSx1262.h"
 
 namespace esphome {
 namespace uart {
@@ -29,8 +30,16 @@ class ESP32ArduinoLoraUARTComponent : public UARTComponent, public Component {
 
   uint32_t get_config();
 
-  HardwareSerial *get_hw_serial() { return this->hw_serial_; }
-  uint8_t get_hw_serial_number() { return this->number_; }
+  HardwareSerial *get_hw_serial() {
+    //going to return NULL since we don't have a HW Serial
+    //not sure what this will impact (probably don't use with logger?) 
+    //return this->hw_serial_;
+    return NULL; }
+  uint8_t get_hw_serial_number() { 
+    //going to return 0 since we don't have a HW Serial
+    //not sure what this will impact (probably don't use with logger?) 
+    //return this->number_; 
+    return 0;   }
 
   /**
    * Load the UART with the current settings.
@@ -48,10 +57,12 @@ class ESP32ArduinoLoraUARTComponent : public UARTComponent, public Component {
   void load_settings() override { this->load_settings(true); }
 
  protected:
+  LoraSx1262 radio;
   void check_logger_conflict() override;
 
-  HardwareSerial *hw_serial_{nullptr};
-  uint8_t number_{0};
+  //don't need these...maybe
+  //HardwareSerial *hw_serial_{nullptr};
+  //uint8_t number_{0};
 };
 
 }  // namespace uart
