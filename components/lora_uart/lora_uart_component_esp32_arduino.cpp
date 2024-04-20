@@ -143,8 +143,8 @@ void ESP32ArduinoLoraUARTComponent::load_settings(bool dump_config) {
     invert = true;
   if (rx_pin_ != nullptr && rx_pin_->is_inverted())
     invert = true;
-  this->hw_serial_->setRxBufferSize(this->rx_buffer_size_);
-  this->hw_serial_->begin(this->baud_rate_, get_config(), rx, tx, invert);
+  //this->hw_serial_->setRxBufferSize(this->rx_buffer_size_);
+  //this->hw_serial_->begin(this->baud_rate_, get_config(), rx, tx, invert);
   if (dump_config) {
     ESP_LOGCONFIG(TAG, "UART %u was reloaded.", this->number_);
     this->dump_config();
@@ -166,7 +166,7 @@ void ESP32ArduinoLoraUARTComponent::dump_config() {
 }
 
 void ESP32ArduinoLoraUARTComponent::write_array(const uint8_t *data, size_t len) {
-  this->hw_serial_->write(data, len);
+  //this->hw_serial_->write(data, len);
 #ifdef USE_UART_DEBUGGER
   for (size_t i = 0; i < len; i++) {
     this->debug_callback_.call(UART_DIRECTION_TX, data[i]);
@@ -177,7 +177,7 @@ void ESP32ArduinoLoraUARTComponent::write_array(const uint8_t *data, size_t len)
 bool ESP32ArduinoLoraUARTComponent::peek_byte(uint8_t *data) {
   if (!this->check_read_timeout_())
     return false;
-  *data = this->hw_serial_->peek();
+  //*data = this->hw_serial_->peek();
   return true;
 }
 
@@ -196,7 +196,7 @@ bool ESP32ArduinoLoraUARTComponent::read_array(uint8_t *data, size_t len) {
 int ESP32ArduinoLoraUARTComponent::available() { return this->hw_serial_->available(); }
 void ESP32ArduinoLoraUARTComponent::flush() {
   ESP_LOGVV(TAG, "    Flushing...");
-  this->hw_serial_->flush();
+  //this->hw_serial_->flush();
 }
 
 void ESP32ArduinoLoraUARTComponent::check_logger_conflict() {

@@ -62,7 +62,7 @@ class ESP32ArduinoLoraUARTComponent : public UARTComponent, public Component {
 
   //don't need these...maybe
   //HardwareSerial *hw_serial_{nullptr};
-  //uint8_t number_{0};
+  uint8_t number_{0};
 };
 
 }  // namespace uart
