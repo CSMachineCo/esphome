@@ -8,7 +8,7 @@
 #include "esphome/core/component.h"
 #include "esphome/core/hal.h"
 #include "esphome/core/log.h"
-#include "uart.h"
+#include "esphome/components/uart/uart.h"
 #include "LoraSx1262.h"
 
 namespace esphome {

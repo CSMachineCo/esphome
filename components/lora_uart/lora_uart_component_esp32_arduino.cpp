@@ -201,7 +201,7 @@ void ESP32ArduinoLoraUARTComponent::flush() {
 }
 
 void ESP32ArduinoLoraUARTComponent::check_logger_conflict() {
-
+  //Since this is not a real uart there cannot be a logger conflict.
 }
 
 }  // namespace uart
