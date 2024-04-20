@@ -152,7 +152,7 @@ void ESP32ArduinoLoraUARTComponent::load_settings(bool dump_config) {
 }
 
 void ESP32ArduinoLoraUARTComponent::dump_config() {
-  ESP_LOGCONFIG(TAG, "UART Bus %d:", this->number_);
+  ESP_LOGCONFIG(TAG, "LoRa UART Bus %d:", this->number_);
   LOG_PIN("  TX Pin: ", tx_pin_);
   LOG_PIN("  RX Pin: ", rx_pin_);
   if (this->rx_pin_ != nullptr) {
