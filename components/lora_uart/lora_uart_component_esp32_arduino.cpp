@@ -184,7 +184,7 @@ bool ESP32ArduinoLoraUARTComponent::peek_byte(uint8_t *data) {
 bool ESP32ArduinoLoraUARTComponent::read_array(uint8_t *data, size_t len) {
   if (!this->check_read_timeout_(len))
     return false;
-  this->hw_serial_->readBytes(data, len);
+  //this->hw_serial_->readBytes(data, len);
 #ifdef USE_UART_DEBUGGER
   for (size_t i = 0; i < len; i++) {
     this->debug_callback_.call(UART_DIRECTION_RX, data[i]);
@@ -193,23 +193,15 @@ bool ESP32ArduinoLoraUARTComponent::read_array(uint8_t *data, size_t len) {
   return true;
 }
 
-int ESP32ArduinoLoraUARTComponent::available() { return this->hw_serial_->available(); }
+int ESP32ArduinoLoraUARTComponent::available() { //return this->hw_serial_->available(); 
+  return 0;}
 void ESP32ArduinoLoraUARTComponent::flush() {
   ESP_LOGVV(TAG, "    Flushing...");
   //this->hw_serial_->flush();
 }
 
 void ESP32ArduinoLoraUARTComponent::check_logger_conflict() {
-#ifdef USE_LOGGER
-  if (this->hw_serial_ == nullptr || logger::global_logger->get_baud_rate() == 0) {
-    return;
-  }
 
-  if (this->hw_serial_ == logger::global_logger->get_hw_serial()) {
-    ESP_LOGW(TAG, "  You're using the same serial port for logging and the UART component. Please "
-                  "disable logging over the serial port by setting logger->baud_rate to 0.");
-  }
-#endif
 }
 
 }  // namespace uart
