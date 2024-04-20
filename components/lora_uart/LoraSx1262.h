@@ -20,6 +20,13 @@
 #include <Arduino.h>
 #include <SPI.h>
 
+//Pin configurations (for HelTec Tracker)
+#define SX1262_NSS   8
+#define SX1262_RESET 12
+#define SX1262_DIO1  14
+#define SX1262_SCK   9
+#define SX1262_MOSI  10
+#define SX1262_MISO  11
 
 //Presets. These help make radio config easier
 #define PRESET_DEFAULT    0
