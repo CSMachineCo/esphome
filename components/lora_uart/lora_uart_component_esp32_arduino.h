@@ -58,6 +58,7 @@ class ESP32ArduinoLoraUARTComponent : public UARTComponent, public Component {
 
  protected:
   LoraSx1262 radio;
+  int radio_init = 0;
   void check_logger_conflict() override;
 
   //don't need these...maybe
