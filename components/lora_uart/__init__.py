@@ -223,6 +223,10 @@ async def debug_to_code(config, parent):
 
 
 async def to_code(config):
+    cg.add_define("USE_SPI")
+    #cg.add_global(spi_ns.using)
+    if CORE.using_arduino:
+        cg.add_library("SPI", None)
     cg.add_global(uart_ns.using)
     var = cg.new_Pvariable(config[CONF_ID])
     await cg.register_component(var, config)
