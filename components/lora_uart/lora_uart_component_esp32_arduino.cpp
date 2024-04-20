@@ -75,7 +75,7 @@ uint32_t ESP32ArduinoLoraUARTComponent::get_config() {
 }
 
 void ESP32ArduinoLoraUARTComponent::setup() {
-  ESP_LOGCONFIG(TAG, "Setting up LoRa UART...");
+  ESP_LOGD(TAG, "Setting up LoRa UART...");
   // Since we're pretty much emulating an esphome uart component with an LoRa radio on SPI
   // Turns out somebody wrote a really simple driver for that...
   if (!radio.begin()) { //Initialize radio
