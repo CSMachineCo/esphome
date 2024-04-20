@@ -11,7 +11,7 @@
 
 namespace esphome {
 namespace uart {
-static const char *const TAG = "uart.arduino_esp32";
+static const char *const TAG = "lora_uart.arduino_esp32";
 
 static const uint32_t UART_PARITY_EVEN = 0 << 0;
 static const uint32_t UART_PARITY_ODD = 1 << 0;
