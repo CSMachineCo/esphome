@@ -18,9 +18,9 @@
 #include "Arduino.h"
 #include "LoraSx1262.h"
 
-bool LoraSx1262::begin(SX1262_SCK, SX1262_MISO, SX1262_MOSI, SX1262_NSS) {
+bool LoraSx1262::begin() {
   //Set up SPI to talk to the LoRa Radio using pins defined in .h file
-  SPI.begin();
+  SPI.begin(SX1262_SCK, SX1262_MISO, SX1262_MOSI, SX1262_NSS);
 
   //Set I/O pins based on the configuration
   //See .h file for pinout diagram

@@ -9,7 +9,7 @@
 #include "esphome/core/hal.h"
 #include "esphome/core/log.h"
 #include "uart.h"
-#include "Arduino-LoRa-Sx1262/src/LoraSx1262.h"
+#include "LoraSx1262.h"
 
 namespace esphome {
 namespace uart {
