@@ -28,10 +28,10 @@ class ESP32ArduinoLoraUARTComponent : public UARTComponent, public Component {
   int available() override;
   void flush() override;
 
-  void set_nss_pin(InternalGPIOPin pin) {_pin_NSS = pin;}
-  void set_sclk_pin(InternalGPIOPin pin) {_pin_SCK = pin;}  
-  void set_reset_pin(InternalGPIOPin pin) {_pin_RESET = pin;}
-  void set_dio1_pin(InternalGPIOPin pin) {_pin_DIO1 = pin;}
+  void set_nss_pin(InternalGPIOPin *pin) {_pin_NSS = pin;}
+  void set_sclk_pin(InternalGPIOPin *pin) {_pin_SCK = pin;}  
+  void set_reset_pin(InternalGPIOPin *pin) {_pin_RESET = pin;}
+  void set_dio1_pin(InternalGPIOPin *pin) {_pin_DIO1 = pin;}
 
   uint32_t get_config();
 
@@ -70,7 +70,7 @@ class ESP32ArduinoLoraUARTComponent : public UARTComponent, public Component {
   //HardwareSerial *hw_serial_{nullptr};
   uint8_t number_{0};
 
-  InternalGPIOPin * _pin_NSS, _pin_SCK, _pin_RESET, _pin_DIO1;
+  InternalGPIOPin *_pin_NSS, *_pin_SCK, *_pin_RESET, *_pin_DIO1;
 };
 
 }  // namespace uart

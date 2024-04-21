@@ -18,7 +18,7 @@
 #include "Arduino.h"
 #include "LoraSx1262.h"
 
-bool LoraSx1262::begin(uint8_t pin_MISO, uint8_t pin_MOSI, uint8_t pin_NSS, uint8_t pin_SCK, uint8_t pin_RESET, uint8_t pin_DIO1) {
+bool LoraSx1262::begin(int8_t pin_MISO, int8_t pin_MOSI, int8_t pin_NSS, int8_t pin_SCK, int8_t pin_RESET, int8_t pin_DIO1) {
   //Set up SPI to talk to the LoRa Radio using pins defined in .h file
   SPI.begin(pin_SCK, pin_MISO, pin_MOSI, pin_NSS);
   
