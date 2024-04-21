@@ -336,7 +336,7 @@ bool LoraSx1262::waitForRadioCommandCompletion(uint32_t timeout) {
 //There's no such thing as "setModeTransmit" because it is set automatically when transmit() is called
 void LoraSx1262::setModeReceive() {
   if (inReceiveMode) { return; }  //We're already in receive mode, this would do nothing
-
+  
   //Set packet parameters
   digitalWrite(_pin_NSS,0); //Enable radio chip-select
   spiBuff[0] = 0x8C;          //Opcode for "SetPacketParameters"

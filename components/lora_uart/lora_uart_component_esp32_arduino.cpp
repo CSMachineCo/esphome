@@ -207,6 +207,8 @@ bool ESP32ArduinoLoraUARTComponent::read_array(uint8_t *data, size_t len) {
   if (!this->check_read_timeout_(len))
     return false;
   //this->hw_serial_->readBytes(data, len);
+  radio.lora_receive_async(data, len) {
+
 #ifdef USE_UART_DEBUGGER
   for (size_t i = 0; i < len; i++) {
     this->debug_callback_.call(UART_DIRECTION_RX, data[i]);
