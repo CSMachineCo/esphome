@@ -201,7 +201,7 @@ CONFIG_SCHEMA = cv.All(
             cv.Optional(CONF_DEBUG): maybe_empty_debug,
         }
     ).extend(cv.COMPONENT_SCHEMA),
-    cv.has_none_or_all_keys(CONF_MOSI_PIN, CONF_MISO_PIN, CONF_SCLK, CONF_NSS, CONF_RESET),
+    cv.has_none_or_all_keys(CONF_MOSI_PIN, CONF_MISO_PIN, CONF_SCLK_PIN, CONF_NSS_PIN, CONF_RESET_PIN),
     validate_invert_esp32,
 )
 
