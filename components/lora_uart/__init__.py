@@ -190,7 +190,7 @@ CONFIG_SCHEMA = cv.All(
             cv.Required(CONF_SCLK): pins.internal_gpio_output_pin_schema,
             cv.Required(CONF_NSS): pins.internal_gpio_output_pin_schema,
             cv.Required(CONF_RESET): pins.internal_gpio_output_pin_schema,
-            cv.Required(CONF_DIO1): validate_rx_pin,
+            cv.Optional(CONF_DIO1): validate_rx_pin,
             cv.Optional(CONF_RX_BUFFER_SIZE, default=256): cv.validate_bytes,
             cv.Optional(CONF_STOP_BITS, default=1): cv.one_of(1, 2, int=True),
             cv.Optional(CONF_DATA_BITS, default=8): cv.int_range(min=5, max=8),
