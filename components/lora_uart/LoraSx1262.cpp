@@ -87,6 +87,23 @@ void LoraSx1262::configureRadioEssentials() {
   digitalWrite(SX1262_NSS,1); //Disable radio chip-select
   delay(100); //Give time for the radio to proces command
 
+  //Set DIO3 as TCXO control
+  //tcxo delay duration is mutiplied by 15.625us in the radio
+  //therefore 5ms delay = 5000us/15.625
+  uint32_t tcxoDelay = 5000 / 15.625;  
+  digitalWrite(SX1262_NSS,0); //Enable radio chip-select
+  spiBuff[0] = 0x97;  //Opcode for "SetDIO3AsTCXOCtrl"
+  
+  //TODO: #def TCXO voatge or make it a function param so user can adjust
+  
+  spiBuff[1] = 0x02;  //TCXO control voltage 1.8V 
+  spiBuff[2] = ( uint8_t )( ( tcxoDelay >> 16 ) & 0xFF );
+  spiBuff[3] = ( uint8_t )( ( tcxoDelay >> 8 ) & 0xFF );
+  spiBuff[4] = ( uint8_t )( tcxoDelay & 0xFF );
+  SPI.transfer(spiBuff,5);
+  digitalWrite(SX1262_NSS,1); //Disable radio chip-select
+  delay(100); //Give time for the radio to proces command 
+
   //Just a single SPI command to set the frequency, but it's broken out
   //into its own function so we can call it on-the-fly when the config changes
   this->configSetFrequency(915000000);  //Set default frequency to 915mhz
