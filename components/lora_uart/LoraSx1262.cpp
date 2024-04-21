@@ -146,7 +146,7 @@ void LoraSx1262::configureRadioEssentials() {
   digitalWrite(SX1262_NSS,0); //Enable radio chip-select
   spiBuff[0] = 0x08;        //0x08 is the opcode for "SetDioIrqParams"
   spiBuff[1] = 0x00;        //IRQMask MSB.  IRQMask is "what interrupts are enabled"
-  spiBuff[2] = 0x02;        //IRQMask LSB         See datasheet table 13-29 for details
+  spiBuff[2] = 0x03;        //IRQMask LSB         See datasheet table 13-29 for details
   spiBuff[3] = 0xFF;        //DIO1 mask MSB.  Of the interrupts detected, which should be triggered on DIO1 pin
   spiBuff[4] = 0xFF;        //DIO1 Mask LSB
   spiBuff[5] = 0x00;        //DIO2 Mask MSB
