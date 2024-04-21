@@ -85,9 +85,9 @@ def validate_invert_esp32(config):
     if (
         CORE.is_esp32
         and CORE.using_arduino
-        and CONF_TX_PIN in config
+        and CONF_MOSI_PIN in config
         and CONF_MISO_PIN in config
-        and config[CONF_TX_PIN][CONF_INVERTED] != config[CONF_MISO_PIN][CONF_INVERTED]
+        and config[CONF_MOSI_PIN][CONF_INVERTED] != config[CONF_MISO_PIN][CONF_INVERTED]
     ):
         raise cv.Invalid(
             "Different invert values for TX and RX pin are not supported for ESP32 when using Arduino."
@@ -121,6 +121,11 @@ CONF_STOP_BITS = "stop_bits"
 CONF_DATA_BITS = "data_bits"
 CONF_PARITY = "parity"
 CONF_MISO_PIN = "miso_pin"
+CONF_MOSI_PIN = "mosi_pin"
+CONF_SCLK = "sclk_pin"
+CONF_NSS = "nss_pin"
+CONF_RESET = "reset_pin"
+CONF_DIO1 = "dio1_pin"
 
 UARTDirection = uart_ns.enum("UARTDirection")
 UART_DIRECTIONS = {
@@ -180,8 +185,12 @@ CONFIG_SCHEMA = cv.All(
         {
             cv.GenerateID(): _uart_declare_type,
             cv.Required(CONF_BAUD_RATE): cv.int_range(min=1),
-            cv.Optional(CONF_TX_PIN): pins.internal_gpio_output_pin_schema,
+            cv.Optional(CONF_MOSI_PIN): pins.internal_gpio_output_pin_schema,
             cv.Optional(CONF_MISO_PIN): validate_rx_pin,
+            cv.Optional(CONF_SCLK): pins.internal_gpio_output_pin_schema,
+            cv.Optional(CONF_NSS): pins.internal_gpio_output_pin_schema,
+            cv.Optional(CONF_RESET): pins.internal_gpio_output_pin_schema,
+            cv.Optional(CONF_DIO1): validate_rx_pin,
             cv.Optional(CONF_RX_BUFFER_SIZE, default=256): cv.validate_bytes,
             cv.Optional(CONF_STOP_BITS, default=1): cv.one_of(1, 2, int=True),
             cv.Optional(CONF_DATA_BITS, default=8): cv.int_range(min=5, max=8),
@@ -194,7 +203,7 @@ CONFIG_SCHEMA = cv.All(
             cv.Optional(CONF_DEBUG): maybe_empty_debug,
         }
     ).extend(cv.COMPONENT_SCHEMA),
-    cv.has_at_least_one_key(CONF_TX_PIN, CONF_MISO_PIN),
+    cv.has_none_or_all_keys(CONF_MOSI_PIN, CONF_MISO_PIN, CONF_SCLK, CONF_NSS, CONF_RESET),
     validate_invert_esp32,
 )
 
@@ -235,8 +244,8 @@ async def to_code(config):
 
     cg.add(var.set_baud_rate(config[CONF_BAUD_RATE]))
 
-    if CONF_TX_PIN in config:
-        tx_pin = await cg.gpio_pin_expression(config[CONF_TX_PIN])
+    if CONF_MOSI_PIN in config:
+        tx_pin = await cg.gpio_pin_expression(config[CONF_MOSI_PIN])
         cg.add(var.set_tx_pin(tx_pin))
     if CONF_MISO_PIN in config:
         rx_pin = await cg.gpio_pin_expression(config[CONF_MISO_PIN])
@@ -320,10 +329,10 @@ def final_validate_device_schema(
         if require_tx and uart_id_type_str in NATIVE_UART_CLASSES:
             hub_schema[
                 cv.Required(
-                    CONF_TX_PIN,
+                    CONF_MOSI_PIN,
                     msg=f"Component {name} requires this uart bus to declare a tx_pin",
                 )
-            ] = validate_pin(CONF_TX_PIN, device)
+            ] = validate_pin(CONF_MOSI_PIN, device)
         if require_rx and uart_id_type_str in NATIVE_UART_CLASSES:
             hub_schema[
                 cv.Required(

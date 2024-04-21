@@ -63,7 +63,7 @@ class LoraSx1262 {
     void updateRadioFrequency();
     void updateModulationParameters();
     bool inReceiveMode = false;
-    uint8_t spiBuff[256];   //Buffer for sending SPI commands to radio
+    uint8_t spiBuff[32];   //Buffer for sending SPI commands to radio
 
     //Config variables (set to PRESET_DEFAULT on init)
     uint32_t pllFrequency;
