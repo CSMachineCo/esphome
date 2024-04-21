@@ -5,7 +5,7 @@ import esphome.config_validation as cv
 import esphome.final_validate as fv
 from esphome.yaml_util import make_data_base
 from esphome import pins, automation
-""" from esphome.const import (
+from esphome.const import (
     CONF_BAUD_RATE,
     CONF_ID,
     CONF_NUMBER,
@@ -28,7 +28,7 @@ from esphome import pins, automation
     CONF_DUMMY_RECEIVER_ID,
     CONF_LAMBDA,
 )
- """
+
 from esphome.core import CORE
 
 CODEOWNERS = ["@esphome/core"]
