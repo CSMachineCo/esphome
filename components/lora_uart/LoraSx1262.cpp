@@ -222,7 +222,7 @@ uint8_t LoraSx1262::transmit(byte *data, int dataLen) {
   //if TX didn't timeout, get the status word and return it, otherwise return 0
   if(waitForRadioCommandCompletion(this->transmitTimeout)) //Wait for tx to complete, with a timeout so we don't wait forever
   {
-    /*
+    
     //Ask the radio for a status update
     digitalWrite(SX1262_NSS,0); //Enable radio chip-select
     spiBuff[0] = 0xC0;          //Opcode for "getStatus" command
@@ -230,7 +230,8 @@ uint8_t LoraSx1262::transmit(byte *data, int dataLen) {
     SPI.transfer(spiBuff,2);
     digitalWrite(SX1262_NSS,1); //Disable radio chip-select
     return spiBuff[1]; 
-    */
+    
+    /*
     //Get radio device errors
     digitalWrite(SX1262_NSS,0); //Enable radio chip-select
     spiBuff[0] = 0x17;          //Opcode for "getStatus" command
@@ -240,7 +241,7 @@ uint8_t LoraSx1262::transmit(byte *data, int dataLen) {
     SPI.transfer(spiBuff,4);
     digitalWrite(SX1262_NSS,1); //Disable radio chip-select
     return spiBuff[2]; 
-    
+    */
   }
 
   return 0;
