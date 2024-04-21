@@ -75,30 +75,7 @@ uint32_t ESP32ArduinoLoraUARTComponent::get_config() {
 }
 
 void ESP32ArduinoLoraUARTComponent::setup() {
-  ESP_LOGD(TAG, "Setting up LoRa UART...");
-  radio_init = 1;
-  // Since we're pretty much emulating an esphome uart component with an LoRa radio on SPI
-  // Turns out somebody wrote a really simple driver for that...
-  if (!radio.begin()) { //Initialize radio
-    ESP_LOGW(TAG, "Failed to Initialize LoRa Radio");
-    radio_init = -1;}
-  else
-  {
-    radio_init = 2;
-  }
   
-  //TODO: Make optional config
-  //FREQUENCY - Set frequency to 915Mhz (default 915Mhz)
-  radio.configSetFrequency(915000000);  //Freq in Hz. Must comply with your local radio regulations. Probably should make this optional configuration
-
-  //TODO: Make optional config
-  //Configuration presets. Comment/uncomment to observe how long each packet takes to transmit. 
-  //radio.configSetPreset(PRESET_DEFAULT);      //Default   - Medium range, medium speed
-  //radio.configSetPreset(PRESET_FAST);       //Fast      - Faster, but less reliable at longer distances.  Use when you need fast speed and radios are closer.
-  radio.configSetPreset(PRESET_LONGRANGE);  //LongRange - Slower and more reliable.  Good for long distance or when reliability is more important than speed
-
-  //TODO: make tx rx pins configurable  
-
 
 //////////This is all old uart stuff...///////////////
 /*
@@ -156,7 +133,31 @@ void ESP32ArduinoLoraUARTComponent::load_settings(bool dump_config) {
     invert = true;
   //this->hw_serial_->setRxBufferSize(this->rx_buffer_size_);
   //this->hw_serial_->begin(this->baud_rate_, get_config(), rx, tx, invert);
-  begin(MISO, MOSI, NSS, SCLK, RESET, DIO1);
+
+  ESP_LOGD(TAG, "Setting up LoRa UART...");
+  radio_init = 1;
+  // Since we're pretty much emulating an esphome uart component with an LoRa radio on SPI
+  // Turns out somebody wrote a really simple driver for that...
+  if (!radio.begin(MISO, MOSI, NSS, SCLK, RESET, DIO1)) { //Initialize radio
+    ESP_LOGW(TAG, "Failed to Initialize LoRa Radio");
+    radio_init = -1;}
+  else
+  {
+    radio_init = 2;
+  }
+  
+  //TODO: Make optional config
+  //FREQUENCY - Set frequency to 915Mhz (default 915Mhz)
+  radio.configSetFrequency(915000000);  //Freq in Hz. Must comply with your local radio regulations. Probably should make this optional configuration
+
+  //TODO: Make optional config
+  //Configuration presets. Comment/uncomment to observe how long each packet takes to transmit. 
+  //radio.configSetPreset(PRESET_DEFAULT);      //Default   - Medium range, medium speed
+  //radio.configSetPreset(PRESET_FAST);       //Fast      - Faster, but less reliable at longer distances.  Use when you need fast speed and radios are closer.
+  radio.configSetPreset(PRESET_LONGRANGE);  //LongRange - Slower and more reliable.  Good for long distance or when reliability is more important than speed
+
+  //TODO: make tx rx pins configurable  
+
   if (dump_config) {
     ESP_LOGCONFIG(TAG, "UART %u was reloaded.", this->number_);
     this->dump_config();
