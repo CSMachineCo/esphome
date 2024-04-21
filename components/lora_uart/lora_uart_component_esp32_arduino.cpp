@@ -177,7 +177,7 @@ void ESP32ArduinoLoraUARTComponent::write_array(const uint8_t *data, size_t len)
   //this->hw_serial_->write(data, len);
   uint8_t status = this->radio.transmit((byte*)data, len);
   char d_out[100];
-  sprintf(d_out, "LoRa Radio Status Code: %X", status)
+  sprintf(d_out, "LoRa Radio Status Code: %X", status);
   ESP_LOGD(TAG, d_out);
 #ifdef USE_UART_DEBUGGER
   for (size_t i = 0; i < len; i++) {
