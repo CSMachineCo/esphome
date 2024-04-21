@@ -6,7 +6,7 @@ import esphome.final_validate as fv
 from esphome.yaml_util import make_data_base
 from esphome import pins, automation
 from esphome.const import (
-    CONF_BAUD_RATE,
+    #CONF_BAUD_RATE,
     CONF_ID,
     CONF_NUMBER,
     CONF_RX_PIN,
@@ -117,9 +117,9 @@ UART_PARITY_OPTIONS = {
     "ODD": UARTParityOptions.UART_CONFIG_PARITY_ODD,
 }
 
-CONF_STOP_BITS = "stop_bits"
-CONF_DATA_BITS = "data_bits"
-CONF_PARITY = "parity"
+#CONF_STOP_BITS = "stop_bits"
+#CONF_DATA_BITS = "data_bits"
+#CONF_PARITY = "parity"
 CONF_MISO_PIN = "miso_pin"
 CONF_MOSI_PIN = "mosi_pin"
 CONF_SCLK = "sclk_pin"
@@ -184,7 +184,7 @@ CONFIG_SCHEMA = cv.All(
     cv.Schema(
         {
             cv.GenerateID(): _uart_declare_type,
-            cv.Optional(CONF_BAUD_RATE): cv.int_range(min=1),
+            #cv.Optional(CONF_BAUD_RATE): cv.int_range(min=1),
             cv.Required(CONF_MOSI_PIN): pins.internal_gpio_output_pin_schema,
             cv.Required(CONF_MISO_PIN): validate_rx_pin,
             cv.Required(CONF_SCLK): pins.internal_gpio_output_pin_schema,
@@ -192,11 +192,9 @@ CONFIG_SCHEMA = cv.All(
             cv.Required(CONF_RESET): pins.internal_gpio_output_pin_schema,
             cv.Optional(CONF_DIO1): validate_rx_pin,
             cv.Optional(CONF_RX_BUFFER_SIZE, default=256): cv.validate_bytes,
-            cv.Optional(CONF_STOP_BITS, default=1): cv.one_of(1, 2, int=True),
-            cv.Optional(CONF_DATA_BITS, default=8): cv.int_range(min=5, max=8),
-            cv.Optional(CONF_PARITY, default="NONE"): cv.enum(
-                UART_PARITY_OPTIONS, upper=True
-            ),
+            #cv.Optional(CONF_STOP_BITS, default=1): cv.one_of(1, 2, int=True),
+            #cv.Optional(CONF_DATA_BITS, default=8): cv.int_range(min=5, max=8),
+            #cv.Optional(CONF_PARITY, default="NONE"): cv.enum(UART_PARITY_OPTIONS, upper=True),
             cv.Optional(CONF_INVERT): cv.invalid(
                 "This option has been removed. Please instead use invert in the tx/rx pin schemas."
             ),
@@ -242,7 +240,7 @@ async def to_code(config):
     var = cg.new_Pvariable(config[CONF_ID])
     await cg.register_component(var, config)
 
-    cg.add(var.set_baud_rate(config[CONF_BAUD_RATE]))
+    #cg.add(var.set_baud_rate(config[CONF_BAUD_RATE]))
 
     if CONF_MOSI_PIN in config:
         tx_pin = await cg.gpio_pin_expression(config[CONF_MOSI_PIN])
@@ -251,9 +249,9 @@ async def to_code(config):
         rx_pin = await cg.gpio_pin_expression(config[CONF_MISO_PIN])
         cg.add(var.set_rx_pin(rx_pin))
     cg.add(var.set_rx_buffer_size(config[CONF_RX_BUFFER_SIZE]))
-    cg.add(var.set_stop_bits(config[CONF_STOP_BITS]))
-    cg.add(var.set_data_bits(config[CONF_DATA_BITS]))
-    cg.add(var.set_parity(config[CONF_PARITY]))
+    #cg.add(var.set_stop_bits(config[CONF_STOP_BITS]))
+    #cg.add(var.set_data_bits(config[CONF_DATA_BITS]))
+    #cg.add(var.set_parity(config[CONF_PARITY]))
 
     if CONF_DEBUG in config:
         await debug_to_code(config[CONF_DEBUG], var)
@@ -340,14 +338,14 @@ def final_validate_device_schema(
                     msg=f"Component {name} requires this uart bus to declare a rx_pin",
                 )
             ] = validate_pin(CONF_MISO_PIN, device)
-        if baud_rate is not None:
-            hub_schema[cv.Required(CONF_BAUD_RATE)] = validate_baud_rate
-        if data_bits is not None:
-            hub_schema[cv.Required(CONF_DATA_BITS)] = validate_data_bits
-        if parity is not None:
-            hub_schema[cv.Required(CONF_PARITY)] = validate_parity
-        if stop_bits is not None:
-            hub_schema[cv.Required(CONF_STOP_BITS)] = validate_stop_bits
+        #if baud_rate is not None:
+        #    hub_schema[cv.Required(CONF_BAUD_RATE)] = validate_baud_rate
+        #if data_bits is not None:
+        #    hub_schema[cv.Required(CONF_DATA_BITS)] = validate_data_bits
+        #if parity is not None:
+        #    hub_schema[cv.Required(CONF_PARITY)] = validate_parity
+        #if stop_bits is not None:
+        #    hub_schema[cv.Required(CONF_STOP_BITS)] = validate_stop_bits
         return cv.Schema(hub_schema, extra=cv.ALLOW_EXTRA)(hub_config)
 
     return cv.Schema(
