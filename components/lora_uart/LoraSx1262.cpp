@@ -185,6 +185,14 @@ uint8_t LoraSx1262::transmit(byte *data, int dataLen) {
     setModeStandby();
   }
 
+  //clear interrupts
+  digitalWrite(SX1262_NSS,0); //Enable radio chip-select
+  spiBuff[0] = 0x02,          //Opcode for ClearIrqStatus command
+  spiBuff[1] = 0xFF;          //Clear all interrupts
+  SPI.transfer(spiBuff,2);    //Send header info
+  digitalWrite(SX1262_NSS,1); //Disable radio chip-select
+  waitForRadioCommandCompletion(100);  //Give time for radio to process the command
+
   digitalWrite(SX1262_NSS,0); //Enable radio chip-select
   spiBuff[0] = 0x8C;          //Opcode for "SetPacketParameters"
   spiBuff[1] = 0x00;          //PacketParam1 = Preamble Len MSB
