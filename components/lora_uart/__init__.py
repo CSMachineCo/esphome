@@ -120,6 +120,7 @@ UART_PARITY_OPTIONS = {
 CONF_STOP_BITS = "stop_bits"
 CONF_DATA_BITS = "data_bits"
 CONF_PARITY = "parity"
+CONF_MISO_PIN = "miso_pin"
 
 UARTDirection = uart_ns.enum("UARTDirection")
 UART_DIRECTIONS = {
