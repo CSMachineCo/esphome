@@ -177,7 +177,10 @@ void ESP32ArduinoLoraUARTComponent::write_array(const uint8_t *data, size_t len)
   //this->hw_serial_->write(data, len);
   uint8_t status = this->radio.transmit((byte*)data, len);
   char d_out[100];
-  sprintf(d_out, "LoRa Radio Status Code: %X", status);
+  //Parse out the status (see datasheet for what each bit means)
+  uint8_t chipMode = (status >> 4) & 0x7;     //Chip mode is bits [6:4] (3-bits)
+  uint8_t commandStatus = (status >> 1) & 0x7;//Command status is bits [3:1] (3-bits)
+  sprintf(d_out, "LoRa Radio Status Code: %X Chipmode: %X Command Status: %X", status, chipMode, commandStatus);
   ESP_LOGD(TAG, d_out);
 #ifdef USE_UART_DEBUGGER
   for (size_t i = 0; i < len; i++) {
