@@ -142,8 +142,13 @@ void ESP32ArduinoLoraUARTComponent::setup() {
 }
 
 void ESP32ArduinoLoraUARTComponent::load_settings(bool dump_config) {
-  int8_t tx = this->tx_pin_ != nullptr ? this->tx_pin_->get_pin() : -1;
-  int8_t rx = this->rx_pin_ != nullptr ? this->rx_pin_->get_pin() : -1;
+  int8_t MOSI = this->tx_pin_ != nullptr ? this->tx_pin_->get_pin() : -1;
+  int8_t MISO = this->rx_pin_ != nullptr ? this->rx_pin_->get_pin() : -1;
+  int8_t SCLK = this->_pin_SCK != nullptr ? this->_pin_SCK->get_pin() : -1;
+  int8_t NSS = this->_pin_NSS != nullptr ? this->_pin_NSS->get_pin() : -1;
+  int8_t RESET = this->_pin_RESET != nullptr ? this->_pin_RESET->get_pin() : -1;
+  int8_t DIO1 = this->_pin_DIO1 != nullptr ? this->_pin_DIO1->get_pin() : -1;
+
   bool invert = false;
   if (tx_pin_ != nullptr && tx_pin_->is_inverted())
     invert = true;
@@ -151,6 +156,7 @@ void ESP32ArduinoLoraUARTComponent::load_settings(bool dump_config) {
     invert = true;
   //this->hw_serial_->setRxBufferSize(this->rx_buffer_size_);
   //this->hw_serial_->begin(this->baud_rate_, get_config(), rx, tx, invert);
+  begin(MISO, MOSI, NSS, SCLK, RESET, DIO1);
   if (dump_config) {
     ESP_LOGCONFIG(TAG, "UART %u was reloaded.", this->number_);
     this->dump_config();

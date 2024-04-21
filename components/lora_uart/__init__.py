@@ -122,10 +122,10 @@ UART_PARITY_OPTIONS = {
 #CONF_PARITY = "parity"
 CONF_MISO_PIN = "miso_pin"
 CONF_MOSI_PIN = "mosi_pin"
-CONF_SCLK = "sclk_pin"
-CONF_NSS = "nss_pin"
-CONF_RESET = "reset_pin"
-CONF_DIO1 = "dio1_pin"
+CONF_SCLK_PIN = "sclk_pin"
+CONF_NSS_PIN = "nss_pin"
+CONF_RESET_PIN = "reset_pin"
+CONF_DIO1_PIN = "dio1_pin"
 
 UARTDirection = uart_ns.enum("UARTDirection")
 UART_DIRECTIONS = {
@@ -187,10 +187,10 @@ CONFIG_SCHEMA = cv.All(
             #cv.Optional(CONF_BAUD_RATE): cv.int_range(min=1),
             cv.Required(CONF_MOSI_PIN): pins.internal_gpio_output_pin_schema,
             cv.Required(CONF_MISO_PIN): validate_rx_pin,
-            cv.Required(CONF_SCLK): pins.internal_gpio_output_pin_schema,
-            cv.Required(CONF_NSS): pins.internal_gpio_output_pin_schema,
-            cv.Required(CONF_RESET): pins.internal_gpio_output_pin_schema,
-            cv.Optional(CONF_DIO1): validate_rx_pin,
+            cv.Required(CONF_SCLK_PIN): pins.internal_gpio_output_pin_schema,
+            cv.Required(CONF_NSS_PIN): pins.internal_gpio_output_pin_schema,
+            cv.Required(CONF_RESET_PIN): pins.internal_gpio_output_pin_schema,
+            cv.Optional(CONF_DIO1_PIN): validate_rx_pin,
             cv.Optional(CONF_RX_BUFFER_SIZE, default=256): cv.validate_bytes,
             #cv.Optional(CONF_STOP_BITS, default=1): cv.one_of(1, 2, int=True),
             #cv.Optional(CONF_DATA_BITS, default=8): cv.int_range(min=5, max=8),
@@ -248,6 +248,19 @@ async def to_code(config):
     if CONF_MISO_PIN in config:
         rx_pin = await cg.gpio_pin_expression(config[CONF_MISO_PIN])
         cg.add(var.set_rx_pin(rx_pin))
+    if CONF_SCLK_PIN in config:
+        sclk_pin = await cg.gpio_pin_expression(config[CONF_SCLK_PIN])
+        cg.add(var.set_sclk_pin(sclk_pin))
+    if CONF_NSS_PIN in config:
+        nss_pin = await cg.gpio_pin_expression(config[CONF_NSS_PIN])
+        cg.add(var.set_nss_pin(nss_pin))
+    if CONF_RESET_PIN in config:
+        reset_pin = await cg.gpio_pin_expression(config[CONF_RESET_PIN])
+        cg.add(var.set_reset_pin(reset_pin))
+    if CONF_DIO1_PIN in config:
+        dio1_pin = await cg.gpio_pin_expression(config[CONF_DIO1_PIN])
+        cg.add(var.set_dio1_pin(dio1_pin))
+
     cg.add(var.set_rx_buffer_size(config[CONF_RX_BUFFER_SIZE]))
     #cg.add(var.set_stop_bits(config[CONF_STOP_BITS]))
     #cg.add(var.set_data_bits(config[CONF_DATA_BITS]))
