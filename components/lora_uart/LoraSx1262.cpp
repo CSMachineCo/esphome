@@ -159,7 +159,7 @@ void LoraSx1262::configureRadioEssentials() {
 }
 
 
-void LoraSx1262::transmit(byte *data, int dataLen) {
+uint8_t LoraSx1262::transmit(byte *data, int dataLen) {
   //Max lora packet size is 255 bytes
   if (dataLen > 255) { dataLen = 255;}
 
@@ -215,10 +215,24 @@ void LoraSx1262::transmit(byte *data, int dataLen) {
   spiBuff[3] = 0xFF;          //Timeout (3-byte number)
   SPI.transfer(spiBuff,4);
   digitalWrite(SX1262_NSS,1); //Disable radio chip-select
-  waitForRadioCommandCompletion(this->transmitTimeout); //Wait for tx to complete, with a timeout so we don't wait forever
-
+   
   //Remember that we are in Tx mode.  If we want to receive a packet, we need to switch into receiving mode
   inReceiveMode = false;
+
+  //if TX didn't timeout, get the status word and return it, otherwise return 0
+  if(waitForRadioCommandCompletion(this->transmitTimeout)) //Wait for tx to complete, with a timeout so we don't wait forever
+  {
+    //Ask the radio for a status update
+    digitalWrite(SX1262_NSS,0); //Enable radio chip-select
+    spiBuff[0] = 0xC0;          //Opcode for "getStatus" command
+    spiBuff[1] = 0x00;          //Dummy byte, status will overwrite this byte
+    SPI.transfer(spiBuff,2);
+    digitalWrite(SX1262_NSS,1); //Disable radio chip-select
+
+    return spiBuff[1]; 
+  }
+
+  return 0;
 }
 
 /**This command will wait until the radio reports that it is no longer busy.

@@ -37,7 +37,7 @@ class LoraSx1262 {
   public:
     bool begin();
     bool sanityCheck(); /*Returns true if we have an active SPI communication with the radio*/
-    void transmit(byte* data, int dataLen);
+    bool transmit(byte* data, int dataLen);
     int lora_receive_async(byte* buff, int buffMaxLen); /*Checks to see if a lora packet was received yet, returns the packet if available*/
     int lora_receive_blocking(byte* buff, int buffMaxLen, uint32_t timeout); /*Waits until a packet is received, with an optional timeout*/
 
