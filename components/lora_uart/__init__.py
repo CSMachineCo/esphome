@@ -235,7 +235,7 @@ async def to_code(config):
     cg.add_define("USE_SPI")
     if CORE.using_arduino:
         cg.add_library("SPI", None)
-    cg.add_library("uart", None)
+    #cg.add_library("uart", None)
 
     cg.add_global(uart_ns.using)
     var = cg.new_Pvariable(config[CONF_ID])
