@@ -5,7 +5,7 @@ import esphome.config_validation as cv
 import esphome.final_validate as fv
 from esphome.yaml_util import make_data_base
 from esphome import pins, automation
-from esphome.const import (
+""" from esphome.const import (
     CONF_BAUD_RATE,
     CONF_ID,
     CONF_NUMBER,
@@ -28,6 +28,7 @@ from esphome.const import (
     CONF_DUMMY_RECEIVER_ID,
     CONF_LAMBDA,
 )
+ """
 from esphome.core import CORE
 
 CODEOWNERS = ["@esphome/core"]
@@ -85,8 +86,8 @@ def validate_invert_esp32(config):
         CORE.is_esp32
         and CORE.using_arduino
         and CONF_TX_PIN in config
-        and CONF_RX_PIN in config
-        and config[CONF_TX_PIN][CONF_INVERTED] != config[CONF_RX_PIN][CONF_INVERTED]
+        and CONF_MISO_PIN in config
+        and config[CONF_TX_PIN][CONF_INVERTED] != config[CONF_MISO_PIN][CONF_INVERTED]
     ):
         raise cv.Invalid(
             "Different invert values for TX and RX pin are not supported for ESP32 when using Arduino."
@@ -179,7 +180,7 @@ CONFIG_SCHEMA = cv.All(
             cv.GenerateID(): _uart_declare_type,
             cv.Required(CONF_BAUD_RATE): cv.int_range(min=1),
             cv.Optional(CONF_TX_PIN): pins.internal_gpio_output_pin_schema,
-            cv.Optional(CONF_RX_PIN): validate_rx_pin,
+            cv.Optional(CONF_MISO_PIN): validate_rx_pin,
             cv.Optional(CONF_RX_BUFFER_SIZE, default=256): cv.validate_bytes,
             cv.Optional(CONF_STOP_BITS, default=1): cv.one_of(1, 2, int=True),
             cv.Optional(CONF_DATA_BITS, default=8): cv.int_range(min=5, max=8),
@@ -192,7 +193,7 @@ CONFIG_SCHEMA = cv.All(
             cv.Optional(CONF_DEBUG): maybe_empty_debug,
         }
     ).extend(cv.COMPONENT_SCHEMA),
-    cv.has_at_least_one_key(CONF_TX_PIN, CONF_RX_PIN),
+    cv.has_at_least_one_key(CONF_TX_PIN, CONF_MISO_PIN),
     validate_invert_esp32,
 )
 
@@ -224,9 +225,9 @@ async def debug_to_code(config, parent):
 
 async def to_code(config):
     cg.add_define("USE_SPI")
-    #cg.add_global(spi_ns.using)
     if CORE.using_arduino:
         cg.add_library("SPI", None)
+
     cg.add_global(uart_ns.using)
     var = cg.new_Pvariable(config[CONF_ID])
     await cg.register_component(var, config)
@@ -236,8 +237,8 @@ async def to_code(config):
     if CONF_TX_PIN in config:
         tx_pin = await cg.gpio_pin_expression(config[CONF_TX_PIN])
         cg.add(var.set_tx_pin(tx_pin))
-    if CONF_RX_PIN in config:
-        rx_pin = await cg.gpio_pin_expression(config[CONF_RX_PIN])
+    if CONF_MISO_PIN in config:
+        rx_pin = await cg.gpio_pin_expression(config[CONF_MISO_PIN])
         cg.add(var.set_rx_pin(rx_pin))
     cg.add(var.set_rx_buffer_size(config[CONF_RX_BUFFER_SIZE]))
     cg.add(var.set_stop_bits(config[CONF_STOP_BITS]))
@@ -325,10 +326,10 @@ def final_validate_device_schema(
         if require_rx and uart_id_type_str in NATIVE_UART_CLASSES:
             hub_schema[
                 cv.Required(
-                    CONF_RX_PIN,
+                    CONF_MISO_PIN,
                     msg=f"Component {name} requires this uart bus to declare a rx_pin",
                 )
-            ] = validate_pin(CONF_RX_PIN, device)
+            ] = validate_pin(CONF_MISO_PIN, device)
         if baud_rate is not None:
             hub_schema[cv.Required(CONF_BAUD_RATE)] = validate_baud_rate
         if data_bits is not None:
