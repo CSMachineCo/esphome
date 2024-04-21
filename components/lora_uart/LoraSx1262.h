@@ -38,6 +38,7 @@ class LoraSx1262 {
     bool begin(int8_t pin_MISO, int8_t pin_MOSI, int8_t pin_NSS, int8_t pin_SCK, int8_t pin_RESET, int8_t pin_DIO1 = 14);
     bool sanityCheck(); /*Returns true if we have an active SPI communication with the radio*/
     uint8_t transmit(byte* data, int dataLen);
+    int available();
     int lora_receive_async(byte* buff, int buffMaxLen); /*Checks to see if a lora packet was received yet, returns the packet if available*/
     int lora_receive_blocking(byte* buff, int buffMaxLen, uint32_t timeout); /*Waits until a packet is received, with an optional timeout*/
 

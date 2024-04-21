@@ -206,7 +206,7 @@ bool ESP32ArduinoLoraUARTComponent::peek_byte(uint8_t *data) {
 bool ESP32ArduinoLoraUARTComponent::read_array(uint8_t *data, size_t len) {
   if (!this->check_read_timeout_(len))
     return false;
-    
+
   char d_out[100];
   sprintf(d_out, "LoRa Radio Rcv Async bytes: %d", len);
   ESP_LOGD(TAG, d_out);
@@ -221,8 +221,12 @@ bool ESP32ArduinoLoraUARTComponent::read_array(uint8_t *data, size_t len) {
   return true;
 }
 
-int ESP32ArduinoLoraUARTComponent::available() { //return this->hw_serial_->available(); 
-  return 0;}
+int ESP32ArduinoLoraUARTComponent::available() 
+{ 
+  //return this->hw_serial_->available(); 
+  return this->available();
+  
+}
 void ESP32ArduinoLoraUARTComponent::flush() {
   ESP_LOGVV(TAG, "    Flushing...");
   //this->hw_serial_->flush();

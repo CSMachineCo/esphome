@@ -379,6 +379,25 @@ void LoraSx1262::setModeStandby() {
   inReceiveMode = false;  //No longer in receive mode
 }
 
+/*
+This funtion returns the size of the available payload in bytes*/
+int LoraSx1262::available()
+{
+  //get paclet length
+  digitalWrite(_pin_NSS,0); //Enable radio chip-select
+  spiBuff[0] = 0x13;          //Opcode for GetRxBufferStatus command
+  spiBuff[1] = 0xFF;          //Dummy.  Returns radio status
+  spiBuff[2] = 0xFF;          //Dummy.  Returns loraPacketLength
+  spiBuff[3] = 0xFF;          //Dummy.  Returns memory offset (address)
+  SPI.transfer(spiBuff,4);
+  digitalWrite(_pin_NSS,1); //Disable radio chip-select
+
+  uint8_t payloadLen = spiBuff[2];    //How long the lora packet is
+  uint8_t startAddress = spiBuff[3];  //Where in 1262 memory is the packet stored
+
+  return payloadLen;
+}
+
 /*Receive a packet if available
 If available, this will return the size of the packet and store the packet contents into the user-provided buffer.
 A max length of the buffer can be provided to avoid buffer overflow.  If buffer is not large enough for entire payload, overflow is thrown out.
