@@ -214,6 +214,10 @@ void ESP32ArduinoLoraUARTComponent::read_radio()
   //if we got new data from radio need to write to read buffer
   if(bytes_read > 0)
   {
+    char d_out[100];
+    sprintf(d_out, "LoRa Radio Rcv Async bytes: %d", bytes_read);
+    ESP_LOGD(TAG, d_out);
+  
     for(int i = 0; i < bytes_read; i++)
     {
       if(this->buff_write_ptr_ > 511) //buff wrapped
@@ -250,12 +254,7 @@ bool ESP32ArduinoLoraUARTComponent::read_array(uint8_t *data, size_t len) {
     return false;
   }
 
-/*  char d_out[100];
-  sprintf(d_out, "LoRa Radio Rcv Async bytes: %d", len);
-  ESP_LOGD(TAG, d_out);
-  //this->hw_serial_->readBytes(data, len);
-  this->radio.lora_receive_async(data, len);
-*/
+
 
 #ifdef USE_UART_DEBUGGER
   for (size_t i = 0; i < len; i++) {
