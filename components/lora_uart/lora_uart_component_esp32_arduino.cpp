@@ -246,7 +246,7 @@ bool ESP32ArduinoLoraUARTComponent::read_array(uint8_t *data, size_t len) {
     {
       if(this->buff_read_ptr_ > 511)  //buffer wrapped
         this->buff_read_ptr_ = 0;
-      data[i] = this->buff_read_ptr_;
+      data[i] = this->read_buffer_[this->buff_read_ptr_];
       this->buff_read_ptr_++;
     }
   }
