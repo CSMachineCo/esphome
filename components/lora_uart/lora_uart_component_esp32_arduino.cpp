@@ -206,7 +206,7 @@ bool ESP32ArduinoLoraUARTComponent::peek_byte(uint8_t *data) {
   return true;
 }
 
-void read_radio()
+void ESP32ArduinoLoraUARTComponent::read_radio()
 {
   //try to read from radio
   int bytes_read = this->radio.lora_receive_async(this->temp_buffer_, 256);
@@ -214,11 +214,11 @@ void read_radio()
   //if we got new data from radio need to write to read buffer
   if(bytes_read > 0)
   {
-    for(int x = 0; x < bytes_read; i++)
+    for(int i = 0; i < bytes_read; i++)
     {
       if(this->buff_write_ptr_ > 511) //buff wrapped
         this->buff_write_ptr_ = 0;
-      this->read_buffer_[this->buff_write_ptr_] = this->temp_buffer_[x];
+      this->read_buffer_[this->buff_write_ptr_] = this->temp_buffer_[i];
       this->buff_write_ptr_++;
     }
   }
@@ -229,7 +229,7 @@ void read_radio()
   // @return True if the specified number of bytes were successfully read, false otherwise.
 bool ESP32ArduinoLoraUARTComponent::read_array(uint8_t *data, size_t len) {
   //check radio for data
-  this->read_radio()
+  this->read_radio();
 
   //get data available in read buffer
   int buffer_data_avail = this->available();
@@ -237,7 +237,7 @@ bool ESP32ArduinoLoraUARTComponent::read_array(uint8_t *data, size_t len) {
   //determine if we have enough data to fill request
   if(buffer_data_avail >= len)
   {
-    for(int x = 0; x < len; i++)
+    for(int i = 0; i < len; i++)
     {
       if(this->buff_read_ptr_ > 511)  //buffer wrapped
         this->buff_read_ptr_ = 0;

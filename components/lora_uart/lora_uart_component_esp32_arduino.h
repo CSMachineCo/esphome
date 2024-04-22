@@ -71,7 +71,7 @@ class ESP32ArduinoLoraUARTComponent : public UARTComponent, public Component {
   void check_logger_conflict() override;
 
   //this funtion reads available data from radio and loads it into the read buffer
-  void read_radio()
+  void read_radio();
 
   //don't need these...maybe
   //HardwareSerial *hw_serial_{nullptr};
