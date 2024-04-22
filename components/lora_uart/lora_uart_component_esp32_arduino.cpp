@@ -224,7 +224,13 @@ bool ESP32ArduinoLoraUARTComponent::read_array(uint8_t *data, size_t len) {
 int ESP32ArduinoLoraUARTComponent::available() 
 { 
   //return this->hw_serial_->available(); 
-  return this->radio.available();
+  int avail = this->radio.available();
+  if(avail > 0)
+  {
+      char d_out[100];
+      sprintf(d_out, "LoRa Radio bytes avail: %d", avail);
+      ESP_LOGD(TAG, d_out);
+  }
   
 }
 void ESP32ArduinoLoraUARTComponent::flush() {
