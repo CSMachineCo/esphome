@@ -266,7 +266,9 @@ bool ESP32ArduinoLoraUARTComponent::read_array(uint8_t *data, size_t len) {
 
 int ESP32ArduinoLoraUARTComponent::available() 
 { 
-  
+  //check radio for data
+  this->read_radio();
+
   int buffer_data_avail = 0;
   //determine how much buffer data we have
   if(this->buff_write_ptr_ < this->buff_read_ptr_)  //buffer wrapped
