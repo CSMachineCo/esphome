@@ -211,13 +211,13 @@ void ESP32ArduinoLoraUARTComponent::read_radio()
   //try to read from radio
   int bytes_read = this->radio.lora_receive_async(this->temp_buffer_, 256);
 
+  char d_out[100];
+  sprintf(d_out, "LoRa Radio Rcv Async bytes: %d", bytes_read);
+  ESP_LOGD(TAG, d_out);
+  
   //if we got new data from radio need to write to read buffer
   if(bytes_read > 0)
   {
-    char d_out[100];
-    sprintf(d_out, "LoRa Radio Rcv Async bytes: %d", bytes_read);
-    ESP_LOGD(TAG, d_out);
-  
     for(int i = 0; i < bytes_read; i++)
     {
       if(this->buff_write_ptr_ > 511) //buff wrapped
