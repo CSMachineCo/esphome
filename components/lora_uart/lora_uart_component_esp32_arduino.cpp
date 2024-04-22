@@ -223,6 +223,7 @@ bool ESP32ArduinoLoraUARTComponent::read_array(uint8_t *data, size_t len) {
 
 int ESP32ArduinoLoraUARTComponent::available() 
 { 
+  ESP_LOGD(TAG, "Lora available() call");
   //return this->hw_serial_->available(); 
   return this->radio.available();
   
