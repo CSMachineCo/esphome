@@ -230,7 +230,9 @@ int ESP32ArduinoLoraUARTComponent::available()
       char d_out[100];
       sprintf(d_out, "LoRa Radio bytes avail: %d", avail);
       ESP_LOGD(TAG, d_out);
+      return avail;
   }
+  return 0;
   
 }
 void ESP32ArduinoLoraUARTComponent::flush() {
