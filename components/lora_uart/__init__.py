@@ -190,7 +190,7 @@ CONFIG_SCHEMA = cv.All(
             cv.Required(CONF_SCLK_PIN): pins.internal_gpio_output_pin_schema,
             cv.Required(CONF_NSS_PIN): pins.internal_gpio_output_pin_schema,
             cv.Required(CONF_RESET_PIN): pins.internal_gpio_output_pin_schema,
-            cv.Optional(CONF_DIO1_PIN): validate_rx_pin,
+            cv.Required(CONF_DIO1_PIN): validate_rx_pin,
             cv.Optional(CONF_RX_BUFFER_SIZE, default=256): cv.validate_bytes,
             #cv.Optional(CONF_STOP_BITS, default=1): cv.one_of(1, 2, int=True),
             #cv.Optional(CONF_DATA_BITS, default=8): cv.int_range(min=5, max=8),
@@ -201,7 +201,7 @@ CONFIG_SCHEMA = cv.All(
             cv.Optional(CONF_DEBUG): maybe_empty_debug,
         }
     ).extend(cv.COMPONENT_SCHEMA),
-    cv.has_none_or_all_keys(CONF_MOSI_PIN, CONF_MISO_PIN, CONF_SCLK_PIN, CONF_NSS_PIN, CONF_RESET_PIN),
+    cv.has_none_or_all_keys(CONF_MOSI_PIN, CONF_MISO_PIN, CONF_SCLK_PIN, CONF_NSS_PIN, CONF_RESET_PIN, CONF_DIO1_PIN),
     validate_invert_esp32,
 )
 
