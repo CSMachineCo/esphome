@@ -119,6 +119,9 @@ void ESP32ArduinoLoraUARTComponent::setup() {
 }
 
 void ESP32ArduinoLoraUARTComponent::load_settings(bool dump_config) {
+  buff_write_ptr_ = 0;
+  buff_read_ptr_ = 0;
+
   int8_t MOSI = this->tx_pin_ != nullptr ? this->tx_pin_->get_pin() : -1;
   int8_t MISO = this->rx_pin_ != nullptr ? this->rx_pin_->get_pin() : -1;
   int8_t SCLK = this->_pin_SCK != nullptr ? this->_pin_SCK->get_pin() : -1;
@@ -199,19 +202,60 @@ void ESP32ArduinoLoraUARTComponent::write_array(const uint8_t *data, size_t len)
 bool ESP32ArduinoLoraUARTComponent::peek_byte(uint8_t *data) {
   if (!this->check_read_timeout_())
     return false;
-  //*data = this->hw_serial_->peek();
+  *data = this->read_buffer_[this->buff_read_ptr_];
   return true;
 }
 
-bool ESP32ArduinoLoraUARTComponent::read_array(uint8_t *data, size_t len) {
-  if (!this->check_read_timeout_(len))
-    return false;
+void read_radio()
+{
+  //try to read from radio
+  int bytes_read = this->radio.lora_receive_async(this->temp_buffer_, 256);
 
-  char d_out[100];
+  //if we got new data from radio need to write to read buffer
+  if(bytes_read > 0)
+  {
+    for(int x = 0; x < bytes_read; i++)
+    {
+      if(this->buff_write_ptr_ > 511) //buff wrapped
+        this->buff_write_ptr_ = 0;
+      this->read_buffer_[this->buff_write_ptr_] = this->temp_buffer_[x];
+      this->buff_write_ptr_++;
+    }
+  }
+}
+
+// @param data Pointer to the array where the read data will be stored.
+  // @param len Number of bytes to read.
+  // @return True if the specified number of bytes were successfully read, false otherwise.
+bool ESP32ArduinoLoraUARTComponent::read_array(uint8_t *data, size_t len) {
+  //check radio for data
+  this->read_radio()
+
+  //get data available in read buffer
+  int buffer_data_avail = this->available();
+  
+  //determine if we have enough data to fill request
+  if(buffer_data_avail >= len)
+  {
+    for(int x = 0; x < len; i++)
+    {
+      if(this->buff_read_ptr_ > 511)  //buffer wrapped
+        this->buff_read_ptr_ = 0;
+      data[i] = this->buff_read_ptr_;
+      this->buff_read_ptr_++;
+    }
+  }
+  else
+  {
+    return false;
+  }
+
+/*  char d_out[100];
   sprintf(d_out, "LoRa Radio Rcv Async bytes: %d", len);
   ESP_LOGD(TAG, d_out);
   //this->hw_serial_->readBytes(data, len);
   this->radio.lora_receive_async(data, len);
+*/
 
 #ifdef USE_UART_DEBUGGER
   for (size_t i = 0; i < len; i++) {
@@ -223,16 +267,15 @@ bool ESP32ArduinoLoraUARTComponent::read_array(uint8_t *data, size_t len) {
 
 int ESP32ArduinoLoraUARTComponent::available() 
 { 
-  //return this->hw_serial_->available(); 
-  int avail = this->radio.available();
-  if(avail > 0)
-  {
-      char d_out[100];
-      sprintf(d_out, "LoRa Radio bytes avail: %d", avail);
-      ESP_LOGD(TAG, d_out);
-      return avail;
-  }
-  return 0;
+  
+  int buffer_data_avail = 0;
+  //determine how much buffer data we have
+  if(this->buff_write_ptr_ < this->buff_read_ptr_)  //buffer wrapped
+    buffer_data_avail = (512 - this->buff_read_ptr_) + this->buff_write_ptr_;
+  else
+    buffer_data_avail = this->buff_write_ptr_ - this->buff_read_ptr_;
+
+  return buffer_data_avail;
   
 }
 void ESP32ArduinoLoraUARTComponent::flush() {

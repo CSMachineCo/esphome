@@ -23,6 +23,10 @@ class ESP32ArduinoLoraUARTComponent : public UARTComponent, public Component {
   void write_array(const uint8_t *data, size_t len) override;
 
   bool peek_byte(uint8_t *data) override;
+
+  // @param data Pointer to the array where the read data will be stored.
+  // @param len Number of bytes to read.
+  // @return True if the specified number of bytes were successfully read, false otherwise.
   bool read_array(uint8_t *data, size_t len) override;
 
   int available() override;
@@ -66,11 +70,20 @@ class ESP32ArduinoLoraUARTComponent : public UARTComponent, public Component {
   int radio_init = 0;
   void check_logger_conflict() override;
 
+  //this funtion reads available data from radio and loads it into the read buffer
+  void read_radio()
+
   //don't need these...maybe
   //HardwareSerial *hw_serial_{nullptr};
   uint8_t number_{0};
 
   InternalGPIOPin *_pin_NSS, *_pin_SCK, *_pin_RESET, *_pin_DIO1;
+
+  //internal buffers since radio driver doesn't do it
+  uint8_t temp_buffer_[256];
+  uint8_t read_buffer_[512];
+  int buff_write_ptr_, buff_read_ptr_;
+
 };
 
 }  // namespace uart
