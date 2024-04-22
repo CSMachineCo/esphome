@@ -211,7 +211,7 @@ bool ESP32ArduinoLoraUARTComponent::read_array(uint8_t *data, size_t len) {
   sprintf(d_out, "LoRa Radio Rcv Async bytes: %d", len);
   ESP_LOGD(TAG, d_out);
   //this->hw_serial_->readBytes(data, len);
-  radio.lora_receive_async(data, len);
+  this->radio.lora_receive_async(data, len);
 
 #ifdef USE_UART_DEBUGGER
   for (size_t i = 0; i < len; i++) {
@@ -224,7 +224,7 @@ bool ESP32ArduinoLoraUARTComponent::read_array(uint8_t *data, size_t len) {
 int ESP32ArduinoLoraUARTComponent::available() 
 { 
   //return this->hw_serial_->available(); 
-  return this->available();
+  return this->radio.available();
   
 }
 void ESP32ArduinoLoraUARTComponent::flush() {
