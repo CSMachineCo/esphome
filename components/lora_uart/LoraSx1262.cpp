@@ -383,6 +383,7 @@ void LoraSx1262::setModeStandby() {
 This funtion returns the size of the available payload in bytes*/
 int LoraSx1262::available()
 {
+  setModeReceive(); //Sets the mode to receive (if not already in receive mode)
   //get paclet length
   digitalWrite(_pin_NSS,0); //Enable radio chip-select
   spiBuff[0] = 0x13;          //Opcode for GetRxBufferStatus command
