@@ -11,7 +11,7 @@
 
 namespace esphome {
 namespace uart {
-namespace lora_uart{
+//namespace lora_uart{
 static const char *const TAG = "lora_uart.arduino_esp32";
 
 static const uint32_t UART_PARITY_EVEN = 0 << 0;
@@ -25,7 +25,6 @@ static const uint32_t UART_NB_STOP_BIT_1 = 1 << 4;
 static const uint32_t UART_NB_STOP_BIT_2 = 3 << 4;
 static const uint32_t UART_TICK_APB_CLOCK = 1 << 27;
 
-ESP32ArduinoLoraUARTComponent::ESP32ArduinoLoraUARTComponent(){global_lora_component = this;}
 
 //Don;t think we need this function...
 uint32_t ESP32ArduinoLoraUARTComponent::get_config() {
@@ -292,7 +291,7 @@ void ESP32ArduinoLoraUARTComponent::check_logger_conflict() {
   //Since this is not a real uart there cannot be a logger conflict.
 }
 
-}  // namespace lora_uart
+//}  // namespace lora_uart
 }  // namespace uart
 }  // namespace esphome
 #endif  // USE_ESP32_FRAMEWORK_ARDUINO

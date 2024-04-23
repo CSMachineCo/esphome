@@ -13,10 +13,13 @@
 
 namespace esphome {
 namespace uart {
-namespace lora_uart{
+//namespace lora_uart{
 
 class ESP32ArduinoLoraUARTComponent : public UARTComponent, public Component {
  public:
+ 
+  ESP32ArduinoLoraUARTComponent(){lora_uart::global_lora_component = this;}
+
   void setup() override;
   void dump_config() override;
   float get_setup_priority() const override { return setup_priority::BUS; }
@@ -37,6 +40,8 @@ class ESP32ArduinoLoraUARTComponent : public UARTComponent, public Component {
   void set_sclk_pin(InternalGPIOPin *pin) {_pin_SCK = pin;}  
   void set_reset_pin(InternalGPIOPin *pin) {_pin_RESET = pin;}
   void set_dio1_pin(InternalGPIOPin *pin) {_pin_DIO1 = pin;}
+
+  int8_t lora_rssi( return radio.rssi; );
 
   uint32_t get_config();
 
@@ -87,9 +92,11 @@ class ESP32ArduinoLoraUARTComponent : public UARTComponent, public Component {
 
 };
 
-extern UARTComponent *global_lora_component;  // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
+namespace lora_uart{
+  extern ESP32ArduinoLoraUARTComponent *global_lora_component;  // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
+}
 
-}  // namesapce lora_uart
+//}  // namesapce lora_uart
 }  // namespace uart
 }  // namespace esphome
 
