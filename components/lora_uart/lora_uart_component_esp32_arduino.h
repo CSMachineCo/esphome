@@ -18,7 +18,7 @@ namespace uart {
 class ESP32ArduinoLoraUARTComponent : public UARTComponent, public Component {
  public:
  
-  void ESP32ArduinoLoraUARTComponent();
+  ESP32ArduinoLoraUARTComponent();
 
   void setup() override;
   void dump_config() override;
