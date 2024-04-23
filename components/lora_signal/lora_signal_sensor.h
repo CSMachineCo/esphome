@@ -10,7 +10,7 @@ namespace lora_signal {
 
 class LoRaSignalSensor : public sensor::Sensor, public PollingComponent {
  public:
-  void update() override { this->publish_state(lora_uart::global_lora_component->lora_rssi()); }
+  void update() override { this->publish_state(uart::lora_uart::global_lora_component->lora_rssi()); }
   void dump_config() override;
 
   std::string unique_id() override { return get_mac_address() + "-lorasignal"; }
