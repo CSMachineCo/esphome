@@ -585,7 +585,7 @@ bool LoraSx1262::configSetPreset(int preset) {
 
   if (preset == PRESET_LONGRANGE) {
     this->bandwidth = 4;            //125khz
-    this->codingRate = 1;           //CR_4_5
+    this->codingRate = 2;           //CR_4_6
     this->spreadingFactor = 12;     //SF12
     this->lowDataRateOptimize = 1;  //Optimize for low data rate (SF12 only)
     this->updateModulationParameters();
