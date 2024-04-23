@@ -230,6 +230,9 @@ void ESP32ArduinoLoraUARTComponent::read_radio()
     //update RSSI
      if (this->rssi_sensor_ != nullptr)
       this->rssi_sensor_->publish_state(radio.rssi);
+    //update SNR
+     if (this->snr_sensor_ != nullptr)
+      this->snr_sensor_->publish_state(radio.snr);
 
   }
 }

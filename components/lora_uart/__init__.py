@@ -133,6 +133,7 @@ CONF_NSS_PIN = "nss_pin"
 CONF_RESET_PIN = "reset_pin"
 CONF_DIO1_PIN = "dio1_pin"
 CONF_RSSI = "rssi"
+CONF_SNR = "snr"
 
 UARTDirection = uart_ns.enum("UARTDirection")
 UART_DIRECTIONS = {
@@ -211,7 +212,15 @@ CONFIG_SCHEMA = cv.All(
                 accuracy_decimals=0,
                 device_class=DEVICE_CLASS_SIGNAL_STRENGTH,
                 state_class=STATE_CLASS_MEASUREMENT,
-                entity_category=ENTITY_CATEGORY_DIAGNOSTIC,),
+                #entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
+                ),
+            cv.Optional(CONF_SNR): sensor.sensor_schema(
+                unit_of_measurement=UNIT_DECIBEL_MILLIWATT,
+                accuracy_decimals=0,
+                device_class=DEVICE_CLASS_SIGNAL_STRENGTH,
+                state_class=STATE_CLASS_MEASUREMENT,
+                #entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
+                ),
         }
     ).extend(cv.COMPONENT_SCHEMA),
     cv.has_none_or_all_keys(CONF_MOSI_PIN, CONF_MISO_PIN, CONF_SCLK_PIN, CONF_NSS_PIN, CONF_RESET_PIN, CONF_DIO1_PIN),
@@ -277,6 +286,9 @@ async def to_code(config):
     if CONF_RSSI in config:
         sens = await sensor.new_sensor(config[CONF_RSSI])
         cg.add(var.set_rssi_sensor(sens))
+    if CONF_SNR in config:
+        sens = await sensor.new_sensor(config[CONF_SNR])
+        cg.add(var.set_snr_sensor(sens))
 
     cg.add(var.set_rx_buffer_size(config[CONF_RX_BUFFER_SIZE]))
     #cg.add(var.set_stop_bits(config[CONF_STOP_BITS]))

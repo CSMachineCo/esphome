@@ -20,6 +20,7 @@ class ESP32ArduinoLoraUARTComponent : public UARTComponent, public Component {
  public:
 
   void set_rssi_sensor(sensor::Sensor *rssi_sensor) { rssi_sensor_ = rssi_sensor; }
+  void set_snr_sensor(sensor::Sensor *snr_sensor) { snr_sensor_ = snr_sensor; }
 
   void setup() override;
   void dump_config() override;
@@ -41,8 +42,6 @@ class ESP32ArduinoLoraUARTComponent : public UARTComponent, public Component {
   void set_sclk_pin(InternalGPIOPin *pin) {_pin_SCK = pin;}  
   void set_reset_pin(InternalGPIOPin *pin) {_pin_RESET = pin;}
   void set_dio1_pin(InternalGPIOPin *pin) {_pin_DIO1 = pin;}
-
-  int8_t lora_rssi(){return radio.rssi; }
 
   uint32_t get_config();
 
@@ -76,6 +75,7 @@ class ESP32ArduinoLoraUARTComponent : public UARTComponent, public Component {
   LoraSx1262 radio;
   int radio_init = 0;
   sensor::Sensor *rssi_sensor_{nullptr};
+  sensor::Sensor *snr_sensor_{nullptr};
 
   void check_logger_conflict() override;
 
