@@ -13,6 +13,7 @@
 
 namespace esphome {
 namespace uart {
+namespace lora_uart{
 
 class ESP32ArduinoLoraUARTComponent : public UARTComponent, public Component {
  public:
@@ -86,6 +87,9 @@ class ESP32ArduinoLoraUARTComponent : public UARTComponent, public Component {
 
 };
 
+extern UARTComponent *global_lora_component;  // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
+
+}  // namesapce lora_uart
 }  // namespace uart
 }  // namespace esphome
 

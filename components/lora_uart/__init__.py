@@ -31,7 +31,7 @@ from esphome.const import (
 
 from esphome.core import CORE
 
-CODEOWNERS = ["@esphome/core"]
+CODEOWNERS = ["@CSMachineCo"]
 uart_ns = cg.esphome_ns.namespace("uart")
 UARTComponent = uart_ns.class_("UARTComponent")
 
@@ -280,6 +280,11 @@ UART_DEVICE_SCHEMA = cv.Schema(
 
 KEY_UART_DEVICES = "uart_devices"
 
+LORA_DEVICE_SCHEMA = cv.Schema(
+    {
+        cv.GenerateID(CONF_UART_ID): cv.use_id(ESP32ArduinoLoraUARTComponent),
+    }
+)
 
 def final_validate_device_schema(
     name: str,
