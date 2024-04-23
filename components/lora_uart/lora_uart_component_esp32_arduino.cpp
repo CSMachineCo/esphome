@@ -227,6 +227,10 @@ void ESP32ArduinoLoraUARTComponent::read_radio()
       this->read_buffer_[this->buff_write_ptr_] = this->temp_buffer_[i];
       this->buff_write_ptr_++;
     }
+    //update RSSI
+     if (this->rssi_sensor_ != nullptr)
+      this->rssi_sensor_->publish_state(radio.rssi);
+
   }
 }
 
