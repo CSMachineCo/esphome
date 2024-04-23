@@ -33,6 +33,7 @@ from esphome.const import (
     ENTITY_CATEGORY_DIAGNOSTIC,
     STATE_CLASS_MEASUREMENT,
     UNIT_DECIBEL_MILLIWATT,
+    UNIT_DECIBEL,
 )
 
 from esphome.core import CORE
@@ -215,7 +216,7 @@ CONFIG_SCHEMA = cv.All(
                 #entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
                 ),
             cv.Optional(CONF_SNR): sensor.sensor_schema(
-                unit_of_measurement=UNIT_DECIBEL_MILLIWATT,
+                unit_of_measurement=UNIT_DECIBEL,
                 accuracy_decimals=0,
                 device_class=DEVICE_CLASS_SIGNAL_STRENGTH,
                 state_class=STATE_CLASS_MEASUREMENT,
