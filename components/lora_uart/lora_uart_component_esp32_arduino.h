@@ -41,7 +41,7 @@ class ESP32ArduinoLoraUARTComponent : public UARTComponent, public Component {
   void set_reset_pin(InternalGPIOPin *pin) {_pin_RESET = pin;}
   void set_dio1_pin(InternalGPIOPin *pin) {_pin_DIO1 = pin;}
 
-  int8_t lora_rssi( return radio.rssi; );
+  int8_t lora_rssi(){return radio.rssi; }
 
   uint32_t get_config();
 
