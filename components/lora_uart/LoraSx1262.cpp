@@ -420,9 +420,9 @@ int LoraSx1262::lora_receive_async(byte* buff, int buffMaxLen) {
 
   //Store these values as class variables so they can be accessed if needed
   //Documentation for what these variables mean can be found in the .h file
-  rssi       = -((int)spiBuff[2]) / 2;  //"Average over last packet received of RSSI. Actual signal power is –RssiPkt/2 (dBm)"
-  snr        =  ((int8_t)spiBuff[3]) / 4;   //SNR is returned as a SIGNED byte, so we need to do some conversion first
-  signalRssi = -((int)spiBuff[4]) / 2;
+  rssi       = -((int)spiBuff[2]) / 2.0;  //"Average over last packet received of RSSI. Actual signal power is –RssiPkt/2 (dBm)"
+  snr        =  ((int8_t)spiBuff[3]) / 4.0;   //SNR is returned as a SIGNED byte, so we need to do some conversion first
+  signalRssi = -((int)spiBuff[4]) / 2.0;
     
   //We're almost ready to read the packet from the radio
   //But first we have to know how big the packet is, and where in the radio memory it is stored

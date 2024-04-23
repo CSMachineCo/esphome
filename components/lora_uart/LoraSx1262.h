@@ -49,9 +49,9 @@ class LoraSx1262 {
     bool configSetSpreadingFactor(int spreadingFactor);
     
     //These variables show signal quality, and are updated automatically whenever a packet is received
-    int rssi = 0;
-    int snr = 0;
-    int signalRssi = 0;
+    float rssi = 0;
+    float snr = 0;
+    float signalRssi = 0;
 
     uint32_t frequencyToPLL(long freqInHz);
 
