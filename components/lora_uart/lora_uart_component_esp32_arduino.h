@@ -9,6 +9,7 @@
 #include "esphome/core/hal.h"
 #include "esphome/core/log.h"
 #include "esphome/components/uart/uart.h"
+#include "esphome/components/sensor/sensor.h"
 #include "LoraSx1262.h"
 
 namespace esphome {
@@ -17,8 +18,8 @@ namespace uart {
 
 class ESP32ArduinoLoraUARTComponent : public UARTComponent, public Component {
  public:
- 
-  ESP32ArduinoLoraUARTComponent();
+
+  void set_rssi_sensor(sensor::Sensor *rssi_sensor) { rssi_sensor_ = rssi_sensor; }
 
   void setup() override;
   void dump_config() override;
@@ -74,6 +75,8 @@ class ESP32ArduinoLoraUARTComponent : public UARTComponent, public Component {
  protected:
   LoraSx1262 radio;
   int radio_init = 0;
+  sensor::Sensor *rssi_sensor_{nullptr};
+
   void check_logger_conflict() override;
 
   //this funtion reads available data from radio and loads it into the read buffer
@@ -91,10 +94,6 @@ class ESP32ArduinoLoraUARTComponent : public UARTComponent, public Component {
   int buff_write_ptr_, buff_read_ptr_;
 
 };
-
-namespace lora_uart{
-  extern ESP32ArduinoLoraUARTComponent *global_lora_component;  // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
-}
 
 //}  // namesapce lora_uart
 }  // namespace uart

@@ -5,6 +5,8 @@ import esphome.config_validation as cv
 import esphome.final_validate as fv
 from esphome.yaml_util import make_data_base
 from esphome import pins, automation
+from esphome.components import sensor
+
 from esphome.const import (
     #CONF_BAUD_RATE,
     CONF_ID,
@@ -27,6 +29,10 @@ from esphome.const import (
     CONF_DUMMY_RECEIVER,
     CONF_DUMMY_RECEIVER_ID,
     CONF_LAMBDA,
+    DEVICE_CLASS_SIGNAL_STRENGTH,
+    ENTITY_CATEGORY_DIAGNOSTIC,
+    STATE_CLASS_MEASUREMENT,
+    UNIT_DECIBEL_MILLIWATT,
 )
 
 from esphome.core import CORE
@@ -126,6 +132,7 @@ CONF_SCLK_PIN = "sclk_pin"
 CONF_NSS_PIN = "nss_pin"
 CONF_RESET_PIN = "reset_pin"
 CONF_DIO1_PIN = "dio1_pin"
+CONF_RSSI = "rssi"
 
 UARTDirection = uart_ns.enum("UARTDirection")
 UART_DIRECTIONS = {
@@ -199,6 +206,12 @@ CONFIG_SCHEMA = cv.All(
                 "This option has been removed. Please instead use invert in the tx/rx pin schemas."
             ),
             cv.Optional(CONF_DEBUG): maybe_empty_debug,
+            cv.Optional(CONF_RSSI): sensor.sensor_schema(
+                unit_of_measurement=UNIT_DECIBEL_MILLIWATT,
+                accuracy_decimals=0,
+                device_class=DEVICE_CLASS_SIGNAL_STRENGTH,
+                state_class=STATE_CLASS_MEASUREMENT,
+                entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
         }
     ).extend(cv.COMPONENT_SCHEMA),
     cv.has_none_or_all_keys(CONF_MOSI_PIN, CONF_MISO_PIN, CONF_SCLK_PIN, CONF_NSS_PIN, CONF_RESET_PIN, CONF_DIO1_PIN),
@@ -261,6 +274,9 @@ async def to_code(config):
     if CONF_DIO1_PIN in config:
         dio1_pin = await cg.gpio_pin_expression(config[CONF_DIO1_PIN])
         cg.add(var.set_dio1_pin(dio1_pin))
+    if CONF_RSSI in config:
+        sens = await sensor.new_sensor(config[CONF_RSSI])
+        cg.add(var.set_rssi_sensor(sens))
 
     cg.add(var.set_rx_buffer_size(config[CONF_RX_BUFFER_SIZE]))
     #cg.add(var.set_stop_bits(config[CONF_STOP_BITS]))
