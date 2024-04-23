@@ -211,7 +211,7 @@ CONFIG_SCHEMA = cv.All(
                 accuracy_decimals=0,
                 device_class=DEVICE_CLASS_SIGNAL_STRENGTH,
                 state_class=STATE_CLASS_MEASUREMENT,
-                entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
+                entity_category=ENTITY_CATEGORY_DIAGNOSTIC,),
         }
     ).extend(cv.COMPONENT_SCHEMA),
     cv.has_none_or_all_keys(CONF_MOSI_PIN, CONF_MISO_PIN, CONF_SCLK_PIN, CONF_NSS_PIN, CONF_RESET_PIN, CONF_DIO1_PIN),
