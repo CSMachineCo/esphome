@@ -15,14 +15,10 @@ namespace esphome {
 namespace uart {
 //namespace lora_uart{
 
-namespace lora_uart{
-  extern ESP32ArduinoLoraUARTComponent *global_lora_component;  // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
-}
-
 class ESP32ArduinoLoraUARTComponent : public UARTComponent, public Component {
  public:
  
-  ESP32ArduinoLoraUARTComponent(){lora_uart::global_lora_component = this;}
+  ESP32ArduinoLoraUARTComponent();
 
   void setup() override;
   void dump_config() override;
@@ -96,7 +92,9 @@ class ESP32ArduinoLoraUARTComponent : public UARTComponent, public Component {
 
 };
 
-
+namespace lora_uart{
+  extern ESP32ArduinoLoraUARTComponent *global_lora_component;  // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
+}
 
 //}  // namesapce lora_uart
 }  // namespace uart
