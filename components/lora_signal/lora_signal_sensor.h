@@ -3,7 +3,7 @@
 #include "esphome/core/component.h"
 #include "esphome/core/helpers.h"
 #include "esphome/components/sensor/sensor.h"
-#include "esphome/components/lora_uart.h"
+#include "../components/lora_uart.h"
 
 namespace esphome {
 namespace lora_signal {
