@@ -25,7 +25,7 @@ static const uint32_t UART_NB_STOP_BIT_1 = 1 << 4;
 static const uint32_t UART_NB_STOP_BIT_2 = 3 << 4;
 static const uint32_t UART_TICK_APB_CLOCK = 1 << 27;
 
-ESP32ArduinoLoraUARTComponent::ESP32ArduinoLoraUARTComponent(){lora_uart::global_lora_component = this;}
+void ESP32ArduinoLoraUARTComponent::ESP32ArduinoLoraUARTComponent(){lora_uart::global_lora_component = this;}
 
 //Don;t think we need this function...
 uint32_t ESP32ArduinoLoraUARTComponent::get_config() {
@@ -79,6 +79,7 @@ uint32_t ESP32ArduinoLoraUARTComponent::get_config() {
 
 void ESP32ArduinoLoraUARTComponent::setup() {
   
+  lora_uart::global_lora_component = this;
 
 //////////This is all old uart stuff...///////////////
 /*
