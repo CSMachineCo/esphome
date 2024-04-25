@@ -207,7 +207,7 @@ uint8_t LoraSx1262::transmit(byte *data, int dataLen) {
   spiBuff[2] = 0x0C;          //PacketParam2 = Preamble Len LSB
   spiBuff[3] = 0x00;          //PacketParam3 = Header Type. 0x00 = Variable Len, 0x01 = Fixed Length
   spiBuff[4] = dataLen;       //PacketParam4 = Payload Length (Max is 255 bytes)
-  spiBuff[5] = 0x00;          //PacketParam5 = CRC Type. 0x00 = Off, 0x01 = on
+  spiBuff[5] = 0x01;          //PacketParam5 = CRC Type. 0x00 = Off, 0x01 = on
   spiBuff[6] = 0x00;          //PacketParam6 = Invert IQ.  0x00 = Standard, 0x01 = Inverted
   SPI.transfer(spiBuff,7);
   digitalWrite(_pin_NSS,1); //Disable radio chip-select
@@ -255,7 +255,7 @@ uint8_t LoraSx1262::transmit(byte *data, int dataLen) {
   //if TX didn't timeout, get the status word and return it, otherwise return 0
   if(waitForRadioCommandCompletion(this->transmitTimeout)) //Wait for tx to complete, with a timeout so we don't wait forever
   {
-   /* 
+    
     //Ask the radio for a status update
     digitalWrite(_pin_NSS,0); //Enable radio chip-select
     spiBuff[0] = 0xC0;          //Opcode for "getStatus" command
@@ -263,8 +263,9 @@ uint8_t LoraSx1262::transmit(byte *data, int dataLen) {
     SPI.transfer(spiBuff,2);
     digitalWrite(_pin_NSS,1); //Disable radio chip-select
     return spiBuff[1]; 
-    */
     
+    
+    /*
     //Get radio device errors
     digitalWrite(_pin_NSS,0); //Enable radio chip-select
     spiBuff[0] = 0x17;          //Opcode for "getStatus" command
@@ -274,7 +275,7 @@ uint8_t LoraSx1262::transmit(byte *data, int dataLen) {
     SPI.transfer(spiBuff,4);
     digitalWrite(_pin_NSS,1); //Disable radio chip-select
     return spiBuff[3]; 
-    
+    */
   }
 
   return 0;
@@ -390,12 +391,29 @@ Returns payload size (1-255) when a packet with a non-zero payload is received. 
 */
 int LoraSx1262::lora_receive_async(byte* buff, int buffMaxLen) {
   setModeReceive(); //Sets the mode to receive (if not already in receive mode)
-
+  
+  bool crc_valid = true;
   //Radio pin DIO1 (interrupt) goes high when we have a packet ready.  If it's low, there's no packet yet
   if (digitalRead(  _pin_DIO1) == false) { return -1; } //Return -1, meanining no packet ready
+  
+  //check CRC status
+  digitalWrite(_pin_NSS,0); //Enable radio chip-select
+  spiBuff[0] = 0x12;          //Opcode for GetIrqStatus command
+  spiBuff[1] = 0x00;          //NOP
+  spiBuff[2] = 0x00;          //NOP IRQ Reg MSB
+  spiBuff[3] = 0x00;          //NOP IRQ Reg LSB
+  SPI.transfer(spiBuff,4);
+  digitalWrite(_pin_NSS,1); //Disable radio chip-select
+  
+  //bit 5 of IRQ Reg LSB is Header CRC error
+  //bit 6 of IRQ Reg LSB is Payload CRC error 
+  if(spiBuff[3] & 0x20 || spiBuff[3] & 0x40)
+    crc_valid = false;
 
   //Tell the radio to clear the interrupt, and set the pin back inactive.
   while (digitalRead(  _pin_DIO1)) {
+    //check CRC status
+
     //Clear all interrupt flags.  This should result in the interrupt pin going low
     digitalWrite(_pin_NSS,0); //Enable radio chip-select
     spiBuff[0] = 0x02;          //Opcode for ClearIRQStatus command
@@ -424,6 +442,10 @@ int LoraSx1262::lora_receive_async(byte* buff, int buffMaxLen) {
   snr        =  ((int8_t)spiBuff[3]) / 4.0;   //SNR is returned as a SIGNED byte, so we need to do some conversion first
   signalRssi = -((int)spiBuff[4]) / 2.0;
     
+  //if invalid CRC stop here and return -2
+  if(!crc_valid)
+    return -2;
+
   //We're almost ready to read the packet from the radio
   //But first we have to know how big the packet is, and where in the radio memory it is stored
   digitalWrite(_pin_NSS,0); //Enable radio chip-select
