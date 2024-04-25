@@ -345,7 +345,7 @@ void LoraSx1262::setModeReceive() {
   spiBuff[2] = 0x0C;          //PacketParam2 = Preamble Len LSB
   spiBuff[3] = 0x00;          //PacketParam3 = Header Type. 0x00 = Variable Len, 0x01 = Fixed Length
   spiBuff[4] = 0xFF;          //PacketParam4 = Payload Length (Max is 255 bytes)
-  spiBuff[5] = 0x00;          //PacketParam5 = CRC Type. 0x00 = Off, 0x01 = on
+  spiBuff[5] = 0x01;          //PacketParam5 = CRC Type. 0x00 = Off, 0x01 = on
   spiBuff[6] = 0x00;          //PacketParam6 = Invert IQ.  0x00 = Standard, 0x01 = Inverted
   SPI.transfer(spiBuff,7);
   digitalWrite(_pin_NSS,1); //Disable radio chip-select
