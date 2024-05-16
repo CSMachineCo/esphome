@@ -281,6 +281,80 @@ uint8_t LoraSx1262::transmit(byte *data, int dataLen) {
   return 0;
 }
 
+uint8_t LoraSx1262::transmit_async(byte *data, int dataLen) {
+  //Max lora packet size is 255 bytes
+  if (dataLen > 255) { dataLen = 255;}
+
+  //Switching directly from rx to tx mode is slow. Go to standby first
+  if (inReceiveMode) {
+    setModeStandby();
+  }
+
+  //clear interrupts
+  digitalWrite(_pin_NSS,0); //Enable radio chip-select
+  spiBuff[0] = 0x02,          //Opcode for ClearIrqStatus command
+  spiBuff[1] = 0xFF;          //Clear all interrupts
+  spiBuff[2] = 0xFF;          //Clear all interrupts
+  SPI.transfer(spiBuff,3);    //Send header info
+  digitalWrite(_pin_NSS,1); //Disable radio chip-select
+  waitForRadioCommandCompletion(100);  //Give time for radio to process the command
+
+  digitalWrite(_pin_NSS,0); //Enable radio chip-select
+  spiBuff[0] = 0x8C;          //Opcode for "SetPacketParameters"
+  spiBuff[1] = 0x00;          //PacketParam1 = Preamble Len MSB
+  spiBuff[2] = 0x0C;          //PacketParam2 = Preamble Len LSB
+  spiBuff[3] = 0x00;          //PacketParam3 = Header Type. 0x00 = Variable Len, 0x01 = Fixed Length
+  spiBuff[4] = dataLen;       //PacketParam4 = Payload Length (Max is 255 bytes)
+  spiBuff[5] = 0x01;          //PacketParam5 = CRC Type. 0x00 = Off, 0x01 = on
+  spiBuff[6] = 0x00;          //PacketParam6 = Invert IQ.  0x00 = Standard, 0x01 = Inverted
+  SPI.transfer(spiBuff,7);
+  digitalWrite(_pin_NSS,1); //Disable radio chip-select
+  waitForRadioCommandCompletion(100);  //Give time for radio to process the command
+
+  //Write the payload to the buffer
+  //  Reminder: PayloadLength is defined in setPacketParams
+  digitalWrite(_pin_NSS,0); //Enable radio chip-select
+  spiBuff[0] = 0x0E,          //Opcode for WriteBuffer command
+  spiBuff[1] = 0x00;          //Dummy byte before writing payload
+  SPI.transfer(spiBuff,2);    //Send header info
+
+  //SPI.transfer overwrites original buffer.  This could probably be confusing to the user
+  //If they tried writing the same buffer twice and got different results
+  //Eg "radio.transmit(buff,10); radio.transmit(buff,10);" would transmit two different packets
+  //We'll make a performance+memory compromise and write in 32 byte chunks to avoid changing the contents
+  //of the original data array
+  //Copy contents to SPI buff until it's full, and then write that
+  //TEST: I tested this method, which uses about 0.1ms (100 microseconds) more time, but it saves us about 10% of ram.
+  //I think this is a fair trade 
+  uint8_t size = sizeof(spiBuff);
+  for (uint16_t i = 0; i < dataLen; i += size) {
+    if (i + size > dataLen) { size = dataLen - i; }
+    memcpy(spiBuff,&(data[i]),size);
+    SPI.transfer(spiBuff,size); //Write the payload itself
+  }
+
+
+  digitalWrite(_pin_NSS,1); //Disable radio chip-select
+  waitForRadioCommandCompletion(1000);   //Give time for radio to process the command
+
+  //Transmit!
+  // An interrupt will be triggered if we surpass our timeout
+  digitalWrite(_pin_NSS,0); //Enable radio chip-select
+  spiBuff[0] = 0x83;          //Opcode for SetTx command
+  spiBuff[1] = 0xFF;          //Timeout (3-byte number)
+  spiBuff[2] = 0xFF;          //Timeout (3-byte number)
+  spiBuff[3] = 0xFF;          //Timeout (3-byte number)
+  SPI.transfer(spiBuff,4);
+  digitalWrite(_pin_NSS,1); //Disable radio chip-select
+   
+  //Remember that we are in Tx mode.  If we want to receive a packet, we need to switch into receiving mode
+  inReceiveMode = false;
+
+  //don't wait for transmit to complete...
+
+  return 1;
+}
+
 /**This command will wait until the radio reports that it is no longer busy.
 This is useful when waiting for commands to finish that take a while such as transmitting packets.
 Specify a timeout (in milliseconds) to avoid an infinite loop if something happens to the radio

@@ -41,6 +41,7 @@ from esphome.core import CORE
 CODEOWNERS = ["@CSMachineCo"]
 uart_ns = cg.esphome_ns.namespace("uart")
 UARTComponent = uart_ns.class_("UARTComponent")
+DEPENDENCIES = ["spi"]
 
 #IDFUARTComponent = uart_ns.class_("IDFUARTComponent", UARTComponent, cg.Component)
 ESP32ArduinoLoraUARTComponent = uart_ns.class_(
