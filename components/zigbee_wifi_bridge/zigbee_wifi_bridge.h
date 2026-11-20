@@ -220,6 +220,7 @@ class ZigbeeWifiBridgeComponent : public Component {
 #endif
 
 #ifdef USE_SENSOR
+  float last_sensor_vals_[11]{};
   sensor::Sensor *tunnel_rtt_sensor_{nullptr};
   sensor::Sensor *zigbee_channel_sensor_{nullptr};
   sensor::Sensor *zigbee_pan_id_sensor_{nullptr};

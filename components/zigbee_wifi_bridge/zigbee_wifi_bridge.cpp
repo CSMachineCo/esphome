@@ -959,22 +959,23 @@ void ZigbeeWifiBridgeComponent::publish_entities(bool force) {
 #endif
 
 #ifdef USE_SENSOR
-  auto publish_if_changed = [force](sensor::Sensor *s, float val) {
-    if (s != nullptr && (force || !s->has_state() || s->raw_state != val)) {
+  auto publish_if_changed = [this, force](size_t idx, sensor::Sensor *s, float val) {
+    if (s != nullptr && (force || !s->has_state() || this->last_sensor_vals_[idx] != val)) {
+      this->last_sensor_vals_[idx] = val;
       s->publish_state(val);
     }
   };
-  publish_if_changed(this->tunnel_rtt_sensor_, static_cast<float>(rtt));
-  publish_if_changed(this->zigbee_channel_sensor_, static_cast<float>(stats.channel ? stats.channel : channel));
-  publish_if_changed(this->zigbee_pan_id_sensor_, static_cast<float>(stats.pan_id));
-  publish_if_changed(this->c6_short_address_sensor_, static_cast<float>(stats.short_addr));
-  publish_if_changed(this->rf_tx_count_sensor_, static_cast<float>(stats.rf_tx_count));
-  publish_if_changed(this->rf_rx_count_sensor_, static_cast<float>(stats.rf_rx_count));
-  publish_if_changed(this->tunnel_tx_count_sensor_, static_cast<float>(tun_tx));
-  publish_if_changed(this->tunnel_rx_count_sensor_, static_cast<float>(tun_rx));
-  publish_if_changed(this->rf_isolated_drops_sensor_, static_cast<float>(stats.rf_isolated_drops));
-  publish_if_changed(this->uart_rx_bytes_sensor_, static_cast<float>(rx_bytes));
-  publish_if_changed(this->uart_crc_errors_sensor_, static_cast<float>(crc_err));
+  publish_if_changed(0, this->tunnel_rtt_sensor_, static_cast<float>(rtt));
+  publish_if_changed(1, this->zigbee_channel_sensor_, static_cast<float>(stats.channel ? stats.channel : channel));
+  publish_if_changed(2, this->zigbee_pan_id_sensor_, static_cast<float>(stats.pan_id));
+  publish_if_changed(3, this->c6_short_address_sensor_, static_cast<float>(stats.short_addr));
+  publish_if_changed(4, this->rf_tx_count_sensor_, static_cast<float>(stats.rf_tx_count));
+  publish_if_changed(5, this->rf_rx_count_sensor_, static_cast<float>(stats.rf_rx_count));
+  publish_if_changed(6, this->tunnel_tx_count_sensor_, static_cast<float>(tun_tx));
+  publish_if_changed(7, this->tunnel_rx_count_sensor_, static_cast<float>(tun_rx));
+  publish_if_changed(8, this->rf_isolated_drops_sensor_, static_cast<float>(stats.rf_isolated_drops));
+  publish_if_changed(9, this->uart_rx_bytes_sensor_, static_cast<float>(rx_bytes));
+  publish_if_changed(10, this->uart_crc_errors_sensor_, static_cast<float>(crc_err));
 #endif
 
 #ifdef USE_TEXT_SENSOR
