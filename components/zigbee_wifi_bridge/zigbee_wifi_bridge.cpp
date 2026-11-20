@@ -191,7 +191,7 @@ void ZigbeeWifiBridgeComponent::loop() {
   this->flush_c6_logs();
 
   uint32_t now = millis();
-  if (!this->initial_controls_published_ || (now - this->last_publish_ms_ >= 1500U)) {
+  if (!this->initial_controls_published_ || (now - this->last_publish_ms_ >= 3000U)) {
     this->publish_entities(!this->initial_controls_published_);
     this->initial_controls_published_ = true;
     this->last_publish_ms_ = now;
@@ -776,6 +776,9 @@ void ZigbeeWifiBridgeComponent::tunnel_task() {
     vTaskDelay(pdMS_TO_TICKS(250));
   }
 
+  // Ensure WiFi modem sleep is disabled so DTIM intervals do not cause 200-400 ms RTT spikes.
+  esp_wifi_set_ps(WIFI_PS_NONE);
+
   // ESPHome's mdns component initializes mdns_init(); safely register our _zbbridge._tcp service on MASTER.
   if (this->role_ == ROLE_MASTER && !this->mdns_service_registered_) {
     esp_err_t init_err = mdns_init();
@@ -956,39 +959,22 @@ void ZigbeeWifiBridgeComponent::publish_entities(bool force) {
 #endif
 
 #ifdef USE_SENSOR
-  if (this->tunnel_rtt_sensor_ != nullptr) {
-    this->tunnel_rtt_sensor_->publish_state(static_cast<float>(rtt));
-  }
-  if (this->zigbee_channel_sensor_ != nullptr) {
-    this->zigbee_channel_sensor_->publish_state(static_cast<float>(stats.channel ? stats.channel : channel));
-  }
-  if (this->zigbee_pan_id_sensor_ != nullptr) {
-    this->zigbee_pan_id_sensor_->publish_state(static_cast<float>(stats.pan_id));
-  }
-  if (this->c6_short_address_sensor_ != nullptr) {
-    this->c6_short_address_sensor_->publish_state(static_cast<float>(stats.short_addr));
-  }
-  if (this->rf_tx_count_sensor_ != nullptr) {
-    this->rf_tx_count_sensor_->publish_state(static_cast<float>(stats.rf_tx_count));
-  }
-  if (this->rf_rx_count_sensor_ != nullptr) {
-    this->rf_rx_count_sensor_->publish_state(static_cast<float>(stats.rf_rx_count));
-  }
-  if (this->tunnel_tx_count_sensor_ != nullptr) {
-    this->tunnel_tx_count_sensor_->publish_state(static_cast<float>(tun_tx));
-  }
-  if (this->tunnel_rx_count_sensor_ != nullptr) {
-    this->tunnel_rx_count_sensor_->publish_state(static_cast<float>(tun_rx));
-  }
-  if (this->rf_isolated_drops_sensor_ != nullptr) {
-    this->rf_isolated_drops_sensor_->publish_state(static_cast<float>(stats.rf_isolated_drops));
-  }
-  if (this->uart_rx_bytes_sensor_ != nullptr) {
-    this->uart_rx_bytes_sensor_->publish_state(static_cast<float>(rx_bytes));
-  }
-  if (this->uart_crc_errors_sensor_ != nullptr) {
-    this->uart_crc_errors_sensor_->publish_state(static_cast<float>(crc_err));
-  }
+  auto publish_if_changed = [force](sensor::Sensor *s, float val) {
+    if (s != nullptr && (force || !s->has_state() || s->raw_state != val)) {
+      s->publish_state(val);
+    }
+  };
+  publish_if_changed(this->tunnel_rtt_sensor_, static_cast<float>(rtt));
+  publish_if_changed(this->zigbee_channel_sensor_, static_cast<float>(stats.channel ? stats.channel : channel));
+  publish_if_changed(this->zigbee_pan_id_sensor_, static_cast<float>(stats.pan_id));
+  publish_if_changed(this->c6_short_address_sensor_, static_cast<float>(stats.short_addr));
+  publish_if_changed(this->rf_tx_count_sensor_, static_cast<float>(stats.rf_tx_count));
+  publish_if_changed(this->rf_rx_count_sensor_, static_cast<float>(stats.rf_rx_count));
+  publish_if_changed(this->tunnel_tx_count_sensor_, static_cast<float>(tun_tx));
+  publish_if_changed(this->tunnel_rx_count_sensor_, static_cast<float>(tun_rx));
+  publish_if_changed(this->rf_isolated_drops_sensor_, static_cast<float>(stats.rf_isolated_drops));
+  publish_if_changed(this->uart_rx_bytes_sensor_, static_cast<float>(rx_bytes));
+  publish_if_changed(this->uart_crc_errors_sensor_, static_cast<float>(crc_err));
 #endif
 
 #ifdef USE_TEXT_SENSOR
