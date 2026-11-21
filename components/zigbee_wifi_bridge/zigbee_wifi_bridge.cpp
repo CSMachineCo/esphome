@@ -181,10 +181,12 @@ void ZigbeeWifiBridgeComponent::setup() {
   xTaskCreate(tunnel_task_trampoline, "zb_tunnel", 6144, this, 10, nullptr);
   xTaskCreate(heartbeat_task_trampoline, "zb_hb", 3072, this, 4, nullptr);
 
-  ESP_LOGI(TAG, "Zigbee WiFi Bridge initialized (role=%s, UART TX=%d RX=%d @ %d bps, ch=%u, port=%u)",
+  ESP_LOGI(TAG, "Zigbee WiFi Bridge initialized (role=%s, UART TX=%d RX=%d @ %d bps, ch=%u, ant=%s, port=%u)",
            this->role_ == ROLE_MASTER ? "MASTER" : "SLAVE",
            this->tx_pin_, this->rx_pin_, this->baud_rate_,
-           this->zigbee_channel_, this->tunnel_port_);
+           this->zigbee_channel_,
+           this->zigbee_antenna_ == ANTENNA_EXTERNAL ? "EXTERNAL" : "INTERNAL",
+           this->tunnel_port_);
 }
 
 void ZigbeeWifiBridgeComponent::loop() {
@@ -203,9 +205,10 @@ void ZigbeeWifiBridgeComponent::dump_config() {
   ESP_LOGCONFIG(TAG, "  Role: %s", this->role_ == ROLE_MASTER ? "MASTER" : "SLAVE");
   ESP_LOGCONFIG(TAG, "  UART1 Pins: TX=%d, RX=%d, RTS=%d, CTS=%d @ %d bps",
                 this->tx_pin_, this->rx_pin_, this->rts_pin_, this->cts_pin_, this->baud_rate_);
-  ESP_LOGCONFIG(TAG, "  Zigbee Channel: %u, Max Children: %u, Bench Isolation: %s",
+  ESP_LOGCONFIG(TAG, "  Zigbee Channel: %u, Max Children: %u, Bench Isolation: %s, Antenna: %s",
                 this->zigbee_channel_, this->max_children_,
-                this->bench_isolation_ ? "ON" : "OFF");
+                this->bench_isolation_ ? "ON" : "OFF",
+                this->zigbee_antenna_ == ANTENNA_EXTERNAL ? "EXTERNAL (GPIO14 HIGH)" : "INTERNAL (GPIO14 LOW)");
   ESP_LOGCONFIG(TAG, "  Tunnel Port: %u, Discovery: %s (%s)",
                 this->tunnel_port_,
                 this->use_mdns_ ? "mDNS" : "Static IP",
@@ -359,6 +362,7 @@ void ZigbeeWifiBridgeComponent::push_config_sync(uint8_t flags) {
   sync.max_children = this->max_children_;
   sync.bench_isolation = this->bench_isolation_ ? 1 : 0;
   sync.flags = flags;
+  sync.zigbee_antenna = static_cast<uint8_t>(this->zigbee_antenna_);
   sync.config_version = this->config_version_;
   xSemaphoreGive(this->state_mutex_);
 
@@ -448,19 +452,27 @@ void ZigbeeWifiBridgeComponent::handle_local_c6_frame(const zb_wire_hdr_t *hdr,
         this->config_synced_ =
             (ack->config_version == this->config_version_) &&
             (ack->role == static_cast<uint8_t>(this->role_)) &&
-            (ack->zigbee_channel == this->zigbee_channel_);
+            (ack->zigbee_channel == this->zigbee_channel_) &&
+            (ack->zigbee_antenna == static_cast<uint8_t>(this->zigbee_antenna_));
         xSemaphoreGive(this->state_mutex_);
 
-        ESP_LOGI(TAG, "C6 config ACK: role=%s ch=%u ver=%u status=%u",
+        ESP_LOGI(TAG, "C6 config ACK: role=%s ch=%u ant=%s ver=%u status=%u",
                  ack->role == ZB_ROLE_MASTER ? "MASTER" : "SLAVE",
-                 ack->zigbee_channel, ack->config_version, ack->applied_status);
+                 ack->zigbee_channel,
+                 ack->zigbee_antenna == ZB_ANTENNA_EXTERNAL ? "EXTERNAL" : "INTERNAL",
+                 ack->config_version, ack->applied_status);
       }
       break;
 
     case ZB_MSG_PHY_STATS:
-      if (hdr->payload_len >= sizeof(zb_msg_phy_stats_t)) {
+      if (hdr->payload_len >= sizeof(zb_msg_phy_stats_t) - 1) {
         xSemaphoreTake(this->state_mutex_, portMAX_DELAY);
-        memcpy(&this->phy_stats_, payload, sizeof(zb_msg_phy_stats_t));
+        memset(&this->phy_stats_, 0, sizeof(this->phy_stats_));
+        size_t copy_len = hdr->payload_len < sizeof(zb_msg_phy_stats_t)
+                              ? hdr->payload_len
+                              : sizeof(zb_msg_phy_stats_t);
+        memcpy(&this->phy_stats_, payload, copy_len);
+        this->phy_stats_has_antenna_ = (hdr->payload_len >= sizeof(zb_msg_phy_stats_t));
         this->c6_link_seen_ = true;
         xSemaphoreGive(this->state_mutex_);
       }
@@ -573,7 +585,9 @@ void ZigbeeWifiBridgeComponent::config_sync_task() {
     bool stats_mismatch = link_seen &&
                           (this->phy_stats_.role != static_cast<uint8_t>(this->role_) ||
                            this->phy_stats_.channel != this->zigbee_channel_ ||
-                           this->phy_stats_.bench_isolation != (this->bench_isolation_ ? 1 : 0));
+                           this->phy_stats_.bench_isolation != (this->bench_isolation_ ? 1 : 0) ||
+                           (this->phy_stats_has_antenna_ &&
+                            this->phy_stats_.zigbee_antenna != static_cast<uint8_t>(this->zigbee_antenna_)));
     uint32_t rx_bytes = this->uart_rx_bytes_;
     uint32_t crc_err = this->uart_crc_err_;
     xSemaphoreGive(this->state_mutex_);

@@ -39,6 +39,11 @@ enum BridgeRole : uint8_t {
   ROLE_SLAVE = ZB_ROLE_SLAVE,
 };
 
+enum ZigbeeAntenna : uint8_t {
+  ANTENNA_INTERNAL = ZB_ANTENNA_INTERNAL,
+  ANTENNA_EXTERNAL = ZB_ANTENNA_EXTERNAL,
+};
+
 class ZigbeeWifiBridgeComponent;
 
 #ifdef USE_SWITCH
@@ -92,6 +97,7 @@ class ZigbeeWifiBridgeComponent : public Component {
     this->yaml_bench_isolation_ = isolation;
     this->bench_isolation_ = isolation;
   }
+  void set_zigbee_antenna(ZigbeeAntenna antenna) { this->zigbee_antenna_ = antenna; }
   void set_tunnel_port(uint16_t port) { this->tunnel_port_ = port; }
   void set_use_mdns(bool use_mdns) { this->use_mdns_ = use_mdns; }
   void set_master_host(const std::string &host) { this->master_host_ = host; }
@@ -179,6 +185,7 @@ class ZigbeeWifiBridgeComponent : public Component {
   uint8_t max_children_{16};
   bool yaml_bench_isolation_{true};
   bool bench_isolation_{true};
+  ZigbeeAntenna zigbee_antenna_{ANTENNA_INTERNAL};
   uint16_t tunnel_port_{7842};
   bool use_mdns_{true};
   std::string master_host_{"zbbridge-master"};
@@ -201,6 +208,7 @@ class ZigbeeWifiBridgeComponent : public Component {
   uint16_t acked_config_ver_{0};
   bool config_synced_{false};
   bool c6_link_seen_{false};
+  bool phy_stats_has_antenna_{false};
   uint32_t uart_rx_bytes_{0};
   uint32_t uart_crc_err_{0};
   uint32_t uart_tx_sync_{0};

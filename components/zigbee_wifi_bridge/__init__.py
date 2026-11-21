@@ -18,6 +18,7 @@ CONF_BAUD_RATE = "baud_rate"
 CONF_ZIGBEE_CHANNEL = "zigbee_channel"
 CONF_MAX_CHILDREN = "max_children"
 CONF_BENCH_ISOLATION = "bench_isolation"
+CONF_ZIGBEE_ANTENNA = "zigbee_antenna"
 CONF_TUNNEL_PORT = "tunnel_port"
 CONF_USE_MDNS = "use_mdns"
 CONF_MASTER_HOST = "master_host"
@@ -29,10 +30,16 @@ ZigbeeWifiBridgeComponent = zigbee_wifi_bridge_ns.class_(
     "ZigbeeWifiBridgeComponent", cg.Component
 )
 BridgeRole = zigbee_wifi_bridge_ns.enum("BridgeRole")
+ZigbeeAntenna = zigbee_wifi_bridge_ns.enum("ZigbeeAntenna")
 
 BRIDGE_ROLES = {
     "MASTER": BridgeRole.ROLE_MASTER,
     "SLAVE": BridgeRole.ROLE_SLAVE,
+}
+
+ZIGBEE_ANTENNAS = {
+    "INTERNAL": ZigbeeAntenna.ANTENNA_INTERNAL,
+    "EXTERNAL": ZigbeeAntenna.ANTENNA_EXTERNAL,
 }
 
 CONFIG_SCHEMA = cv.All(
@@ -50,6 +57,9 @@ CONFIG_SCHEMA = cv.All(
             cv.Optional(CONF_ZIGBEE_CHANNEL, default=15): cv.int_range(min=11, max=26),
             cv.Optional(CONF_MAX_CHILDREN, default=16): cv.int_range(min=4, max=32),
             cv.Optional(CONF_BENCH_ISOLATION, default=True): cv.boolean,
+            cv.Optional(CONF_ZIGBEE_ANTENNA, default="INTERNAL"): cv.enum(
+                ZIGBEE_ANTENNAS, upper=True
+            ),
             cv.Optional(CONF_TUNNEL_PORT, default=7842): cv.port,
             cv.Optional(CONF_USE_MDNS, default=True): cv.boolean,
             cv.Optional(CONF_MASTER_HOST, default="zbbridge-master"): cv.string,
@@ -84,6 +94,7 @@ async def to_code(config):
     cg.add(var.set_zigbee_channel(config[CONF_ZIGBEE_CHANNEL]))
     cg.add(var.set_max_children(config[CONF_MAX_CHILDREN]))
     cg.add(var.set_bench_isolation(config[CONF_BENCH_ISOLATION]))
+    cg.add(var.set_zigbee_antenna(config[CONF_ZIGBEE_ANTENNA]))
     cg.add(var.set_tunnel_port(config[CONF_TUNNEL_PORT]))
     cg.add(var.set_use_mdns(config[CONF_USE_MDNS]))
     cg.add(var.set_master_host(config[CONF_MASTER_HOST]))
